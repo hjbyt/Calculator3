@@ -2,7 +2,6 @@
  * Tree Module
  */
 
-#include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include "Tree.h"
@@ -14,7 +13,7 @@
 
 struct Tree
 {
-    void* value;
+    char* value;
     unsigned childrenCount;
     Tree* firstChild;
     Tree* lastChild;
@@ -27,8 +26,9 @@ struct Tree
  * Functions
  */
 
-Tree* createTree(void* value)
+Tree* createTree(char* value)
 {
+    CHECK(value != NULL);
     Tree* tree = malloc(sizeof(Tree));
     CHECK(tree != NULL);
     tree->value = value;
@@ -52,7 +52,14 @@ void destroyTree(Tree* tree)
     {
         destroyTree(child);
     }
+    free(tree->value);
     free(tree);
+}
+
+char* getValue(Tree* tree)
+{
+    CHECK(tree != NULL);
+    return tree->value;
 }
 
 unsigned int childrenCount(Tree* tree)

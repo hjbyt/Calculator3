@@ -5,6 +5,8 @@
 #ifndef TREE_H_
 #define TREE_H_
 
+#include <stdbool.h>
+
 /*
  * Types
  */
@@ -16,8 +18,9 @@ typedef struct ChildrenIterator ChildrenIterator;
  * Functions
  */
 
-Tree* createTree(void* value);
+Tree* createTree(char* value);
 void destroyTree(Tree* tree);
+char* getValue(Tree* tree);
 unsigned int childrenCount(Tree* tree);
 bool hasChildren(Tree* tree);
 Tree* firstChild(Tree* tree);

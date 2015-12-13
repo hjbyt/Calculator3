@@ -9,6 +9,7 @@
  * Macros
  */
 
+/* TODO: rename to VERIFY ? */
 #define CHECK(condition)    \
     do {                    \
         if (!(condition)) { \
