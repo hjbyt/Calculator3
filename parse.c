@@ -37,7 +37,7 @@ void printLisp(Tree* tree)
 }
 
 /*
- * Internal Function Implementation
+ * Internal Functions
  */
 
 /* TODO: refactor to simplify somehow? */
