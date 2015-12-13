@@ -4,6 +4,6 @@ project(calculator3)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -Werror -pedantic-errors")
 
 set(SOURCE_FILES
-    main.c)
+        main.c common.c common.h tree.c tree.h)
 
 add_executable(calculator3 ${SOURCE_FILES})
