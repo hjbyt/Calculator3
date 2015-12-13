@@ -10,6 +10,16 @@
 #include "common.h"
 
 /*
+ * Constants
+ */
+
+#define PLUS_OPERATION      '+'
+#define MINUS_OPERATION     '-'
+#define MULTIPLY_OPERATION  '*'
+#define DIVIDE_OPERATION    '/'
+#define SUM_RANGE_OPERATION '$'
+
+/*
  * Internal Function Declarations
  */
 
@@ -41,15 +51,15 @@ double evaluateExpressionTree(Tree* tree)
 
     switch (operator)
     {
-        case '+':
+        case PLUS_OPERATION:
             return evaluatePlusExpression(tree);
-        case '-':
+        case MINUS_OPERATION:
             return evaluateMinusExpression(tree);
-        case '*':
+        case MULTIPLY_OPERATION:
             return evaluateMultiplyExpression(tree);
-        case '/':
+        case DIVIDE_OPERATION:
             return evaluateDivideExpression(tree);
-        case '$':
+        case SUM_RANGE_OPERATION:
             return evaluateSumRangeExpression(tree);
         default:
             panic();
