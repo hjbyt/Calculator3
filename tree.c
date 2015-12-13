@@ -46,11 +46,12 @@ void destroyTree(Tree* tree)
     if (tree == NULL) {
         return;
     }
-    for (Tree* child = tree->firstChild;
-         child != NULL;
-         child = child->nextBrother)
+    Tree* child = tree->firstChild;
+    while (child != NULL)
     {
+        Tree* next_child = child->nextBrother;
         destroyTree(child);
+        child = next_child;
     }
     free(tree->value);
     free(tree);
