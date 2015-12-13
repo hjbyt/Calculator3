@@ -72,12 +72,15 @@ double evaluateNumberExpression(Tree* tree)
 double evaluatePlusExpression(Tree* tree)
 {
     CHECK(tree != NULL);
-    switch (childrenCount(tree))
-    {
+    switch (childrenCount(tree)) {
         case 1:
             return evaluateExpressionTree(firstChild(tree));
         case 2:
-            return evaluateExpressionTree(firstChild(tree)) + evaluateExpressionTree(lastChild(tree));
+        {
+            double a = evaluateExpressionTree(firstChild(tree));
+            double b = evaluateExpressionTree(lastChild(tree));
+            return a + b;
+        }
         default:
             panic();
     }
@@ -91,7 +94,11 @@ double evaluateMinusExpression(Tree* tree)
         case 1:
             return -evaluateExpressionTree(firstChild(tree));
         case 2:
-            return evaluateExpressionTree(firstChild(tree)) - evaluateExpressionTree(lastChild(tree));
+        {
+            double a = evaluateExpressionTree(firstChild(tree));
+            double b = evaluateExpressionTree(lastChild(tree));
+            return a - b;
+        }
         default:
             panic();
     }
