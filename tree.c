@@ -108,6 +108,18 @@ Tree* getChild(Tree* tree, int index)
     return child;
 }
 
+Tree* getParent(Tree* tree)
+{
+    CHECK(tree != NULL);
+    return tree->parent;
+}
+
+bool isRoot(Tree* tree)
+{
+    CHECK(tree != NULL);
+    return (tree->parent == NULL);
+}
+
 Tree* firstChild(Tree* tree)
 {
     CHECK(tree != NULL);
@@ -135,9 +147,8 @@ Tree* previousBrother(Tree* child)
 void addChild(Tree* tree, Tree* child)
 {
     CHECK(tree != NULL && child != NULL);
-    CHECK(child->parent == NULL
-          && child->nextBrother == NULL
-          && child->previousBrother == NULL);
+    CHECK(isRoot(child));
+    CHECK(child->nextBrother == NULL && child->previousBrother == NULL);
 
     if (!hasChildren(tree)) {
         tree->firstChild = child;
@@ -148,4 +159,5 @@ void addChild(Tree* tree, Tree* child)
         tree->lastChild = child;
     }
     tree->childrenCount += 1;
+    child->parent = tree;
 }
