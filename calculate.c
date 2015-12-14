@@ -13,6 +13,7 @@
  * Constants
  */
 
+/* Operations */
 #define PLUS_OPERATION      '+'
 #define MINUS_OPERATION     '-'
 #define MULTIPLY_OPERATION  '*'
@@ -70,6 +71,20 @@ double evaluateExpressionTree(Tree* tree)
  * Internal Functions
  */
 
+/**
+ * Evaluate a number expression sub-tree (tree leaf).
+ *
+ * @param
+ * 		Tree* tree - Expression sub-tree to evaluate.
+ *
+ * @preconditions
+ *      - tree != NULL
+ *      - tree is a leaf node.
+ *      - The value of tree is a valid number string
+ *
+ * @return
+ *		Evaluation result.
+ */
 double evaluateNumberExpression(Tree* tree)
 {
     CHECK(tree != NULL);
@@ -79,6 +94,19 @@ double evaluateNumberExpression(Tree* tree)
     return (double)atoi(number_string);
 }
 
+/**
+ * Evaluate a plus expression sub-tree.
+ *
+ * @param
+ * 		Tree* tree - Expression sub-tree to evaluate.
+ *
+ * @preconditions
+ *      - tree != NULL
+ *      - tree has 1 or 2 children.
+ *
+ * @return
+ *		Evaluation result.
+ */
 double evaluatePlusExpression(Tree* tree)
 {
     CHECK(tree != NULL);
@@ -96,6 +124,19 @@ double evaluatePlusExpression(Tree* tree)
     }
 }
 
+/**
+ * Evaluate a minus expression sub-tree.
+ *
+ * @param
+ * 		Tree* tree - Expression sub-tree to evaluate.
+ *
+ * @preconditions
+ *      - tree != NULL
+ *      - tree has 1 or 2 children.
+ *
+ * @return
+ *		Evaluation result.
+ */
 double evaluateMinusExpression(Tree* tree)
 {
     CHECK(tree != NULL);
@@ -114,6 +155,19 @@ double evaluateMinusExpression(Tree* tree)
     }
 }
 
+/**
+ * Evaluate a multiply expression sub-tree.
+ *
+ * @param
+ * 		Tree* tree - Expression sub-tree to evaluate.
+ *
+ * @preconditions
+ *      - tree != NULL
+ *      - tree has 2 children.
+ *
+ * @return
+ *		Evaluation result.
+ */
 double evaluateMultiplyExpression(Tree* tree)
 {
     CHECK(tree != NULL);
@@ -123,6 +177,20 @@ double evaluateMultiplyExpression(Tree* tree)
     return a * b;
 }
 
+/**
+ * Evaluate a divide expression sub-tree.
+ * If the value of the divisor is 0, then NAN is returned.
+ *
+ * @param
+ * 		Tree* tree - Expression sub-tree to evaluate.
+ *
+ * @preconditions
+ *      - tree != NULL
+ *      - tree has 2 children.
+ *
+ * @return
+ *		Evaluation result.
+ */
 double evaluateDivideExpression(Tree* tree)
 {
     CHECK(tree != NULL);
@@ -136,6 +204,20 @@ double evaluateDivideExpression(Tree* tree)
     }
 }
 
+/**
+ * Evaluate a sum-range expression sub-tree.
+ * If the value of the first operand is greater the second operand, then NAN is returned.
+ *
+ * @param
+ * 		Tree* tree - Expression sub-tree to evaluate.
+ *
+ * @preconditions
+ *      - tree != NULL
+ *      - tree has 2 children.
+ *
+ * @return
+ *		Evaluation result.
+ */
 double evaluateSumRangeExpression(Tree* tree)
 {
     CHECK(tree != NULL);

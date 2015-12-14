@@ -9,6 +9,7 @@
  * Macros
  */
 
+/* TODO: doc */
 /* TODO: rename to VERIFY ? */
 #define CHECK(condition)    \
     do {                    \
@@ -21,6 +22,9 @@
  * Functions
  */
 
+/**
+ * Exit the program with EXIT_FAILURE after printing an error message.
+ */
 void panic() __attribute__ ((noreturn));
 
 #endif /* COMMON_H_ */
