@@ -23,13 +23,22 @@
  */
 
 bool interact();
-void getLine(char* buffer, int size);
+void getLine(char* buffer, unsigned int size);
 bool isEndCommand(Tree* tree);
 
 /*
  * Function Implementations
  */
 
+/**
+ * Main function.
+ * Interact with the user, calculating results of lisp arithmetic expressions,
+ * until a quit command is received.
+ *
+ * @return
+ *      EXIT_SUCCESS if no error was encountered,
+ *      EXIT_FAILURE otherwise.
+ */
 int main()
 {
     bool should_continue = true;
@@ -46,6 +55,14 @@ int main()
  * Internal Functions
  */
 
+/**
+ * Make a single user interaction:
+ *      - Get an input line
+ *      - Parse and calculate it, and print the result.
+ *
+ * @return
+ *      false iff the quit command was received.
+ */
 bool interact()
 {
     char line[MAX_LINE_LENGTH + 1];
@@ -71,8 +88,19 @@ bool interact()
     return true;
 }
 
-void getLine(char* buffer, int size)
+/**
+ * Receive a single input line from the user.
+
+ * @param
+ *      char* buffer      - Pre-allocated buffer to store line in.
+ *      unsigned int size - Buffer size.
+ *
+ * @preconditions
+ *      buffer != NULL
+ */
+void getLine(char* buffer, unsigned int size)
 {
+    CHECK(buffer != NULL);
     char* fgets_result = fgets(buffer, size, stdin);
     CHECK(0 == ferror(stdin));
     CHECK(fgets_result != NULL);
@@ -83,6 +111,18 @@ void getLine(char* buffer, int size)
     }
 }
 
+/**
+ * Check if the given expression tree represents the quit command.
+ *
+ * @param
+ *      Tree* tree - Expression tree to examine.
+ *
+ * @preconditions
+ *      tree != NULL
+ *
+ * @return
+ *      true iff the Expression tree represents a quit command.
+ */
 bool isEndCommand(Tree* tree)
 {
     CHECK(tree != NULL);

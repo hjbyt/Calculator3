@@ -26,8 +26,7 @@ typedef struct Tree Tree;
  * 		char* value - String to store in the tree node.
  *
  * @preconditions
- *      - value != NULL, value points to memory allocated by malloc.
- *      - There is enough memory to allocate a new Tree node.
+ *      value != NULL, value points to memory allocated by malloc.
  *
  * @return
  *		Pointer to the new tree node.

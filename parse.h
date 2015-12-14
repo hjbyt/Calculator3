@@ -17,8 +17,7 @@
  * 		const char* string - string to parse.
  *
  * @preconditions
- *      - string != NULL
- *      - There is enough memory for the allocated tree.
+ *      string != NULL
  *
  * @return
  *		Parse tree.
