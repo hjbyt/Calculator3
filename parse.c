@@ -40,6 +40,7 @@ void printLisp(Tree* tree)
  * Internal Functions
  */
 
+/* TODO: Doc */
 /* TODO: refactor to simplify somehow? */
 Tree* parseLispExpression_(const char**sub_string_pointer)
 {
@@ -73,6 +74,15 @@ Tree* parseLispExpression_(const char**sub_string_pointer)
     return tree;
 }
 
+/**
+ * Print the given tree as a lisp expression of the same form as in parseLispExpression.
+ *
+ * @param
+ * 		Tree* tree - Tree to print.
+ *
+ * @preconditions
+ *      tree != NULL
+ */
 void printLisp_(Tree* tree)
 {
     CHECK(tree != NULL);

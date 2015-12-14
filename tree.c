@@ -11,6 +11,7 @@
  * Types
  */
 
+/* TODO: Doc */
 struct Tree
 {
     char* value;
@@ -46,6 +47,8 @@ void destroyTree(Tree* tree)
     if (tree == NULL) {
         return;
     }
+
+    /* Destroy Children */
     Tree* child = tree->firstChild;
     while (child != NULL)
     {
@@ -53,6 +56,8 @@ void destroyTree(Tree* tree)
         destroyTree(child);
         child = next_child;
     }
+
+    /* Destroy this the given node */
     free(tree->value);
     free(tree);
 }
@@ -75,10 +80,11 @@ bool hasChildren(Tree* tree)
     return (tree->childrenCount > 0);
 }
 
-/* Note: index can be negative. */
 Tree* getChild(Tree* tree, int index)
 {
     CHECK(tree != NULL);
+
+    /* Translate possibly negative index to positive index */
     unsigned positive_index;
     if (index < 0) {
         CHECK(index >= -tree->childrenCount);
@@ -88,6 +94,7 @@ Tree* getChild(Tree* tree, int index)
         positive_index = (unsigned int)index;
     }
 
+    /* Iterate through the children to find the one we need */
     Tree* child = NULL;
     if (positive_index <= tree->childrenCount / 2) {
         /* Scan forward */

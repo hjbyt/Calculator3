@@ -19,7 +19,7 @@ typedef struct Tree Tree;
 
 /**
  * Create a new tree node, and assign the given value to it.
- * destroyTree must be called on the returned tree to destroy it.
+ * The created tree has to be destroyed by destroyTree.
  * The created tree takes ownership of value, and will free it when destroyed.
  *
  * @param
@@ -37,12 +37,13 @@ Tree* createTree(char* value);
 /**
  * Destroy a previously created tree, and all of it's children sub-trees recursively.
  * Values assigned to tree nodes are freed as well.
+ * If the given tree is NULL, then nothing is done.
  *
  * @param
  * 		Tree* tree - Tree to destroy.
  *
  * @preconditions
- *      tree != NULL
+ *      tree was previously created by createTree, and wasn't destroyed already.
  */
 void destroyTree(Tree* tree);
 
