@@ -4,7 +4,7 @@
 
 #include <stddef.h>
 #include <stdlib.h>
-#include "Tree.h"
+#include "tree.h"
 #include "common.h"
 
 /*
