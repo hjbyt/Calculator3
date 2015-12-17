@@ -30,15 +30,16 @@ stat returns [SPTree tree] : e1=TERMINATION {$tree = new SPTree($e1.text);}
                            ; 
 
 exp returns [SPTree tree] : 
-			    n=NUMBER {$tree = new SPTree($n.text);}
+			  // Number
+			   n=NUMBER {$tree = new SPTree($n.text);}
+			  // Sub-expression
 			  | LEFT_PARENTHESIS e1=exp RIGHT_PARENTHESIS {$tree = $e1.tree;}
-			  | PLUS e1=exp {$tree = new SPTree("+"); $tree.insertChild($e1.tree);}
-			  | MINUS e1=exp {$tree = new SPTree("-"); $tree.insertChild($e1.tree);}
-			  | e1=exp SUM_RANGE e2=exp {$tree = new SPTree("$"); $tree.insertChild($e1.tree); $tree.insertChild($e2.tree);}
-			  | e1=exp MULPTIPLY e2=exp {$tree = new SPTree("*"); $tree.insertChild($e1.tree); $tree.insertChild($e2.tree);}
-			  | e1=exp DIVIDE    e2=exp {$tree = new SPTree("/"); $tree.insertChild($e1.tree); $tree.insertChild($e2.tree);}
-			  | e1=exp PLUS      e2=exp {$tree = new SPTree("+"); $tree.insertChild($e1.tree); $tree.insertChild($e2.tree);}
-			  | e1=exp MINUS     e2=exp {$tree = new SPTree("-"); $tree.insertChild($e1.tree); $tree.insertChild($e2.tree);}
+			  // Unary operation
+			  | c=(PLUS|MINUS) e1=exp               {$tree = new SPTree($c.text); $tree.insertChild($e1.tree);}
+			  // Binary operation
+			  | e1=exp c=SUM_RANGE 			 e2=exp {$tree = new SPTree($c.text); $tree.insertChild($e1.tree); $tree.insertChild($e2.tree);}
+			  | e1=exp c=(MULPTIPLY|DIVIDE)  e2=exp {$tree = new SPTree($c.text); $tree.insertChild($e1.tree); $tree.insertChild($e2.tree);}
+			  | e1=exp c=(PLUS|MINUS)        e2=exp {$tree = new SPTree($c.text); $tree.insertChild($e1.tree); $tree.insertChild($e2.tree);}
 			  ;
 
 // parser rules start with lowercase letters, lexer rules with uppercase
