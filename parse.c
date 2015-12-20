@@ -13,7 +13,7 @@
  * Internal Function Declarations
  */
 
-Tree* parseLispExpression_(const char**sub_string_pointer);
+Tree* parseLispExpression_(const char** sub_string_pointer);
 void printLisp_(Tree* tree);
 
 /*
@@ -24,7 +24,8 @@ Tree* parseLispExpression(const char* string)
 {
     VERIFY(string != NULL);
     Tree* tree = parseLispExpression_(&string);
-    /* Check that the entire string was processed */
+    /* Check that the entire string was processed,
+     * i.e. the parsing ended successfully at the null-terminator */
     VERIFY(*string == '\0');
     return tree;
 }
@@ -40,11 +41,29 @@ void printLisp(Tree* tree)
  * Internal Functions
  */
 
-/* TODO: Doc */
-/* TODO: refactor to simplify somehow? */
-Tree* parseLispExpression_(const char**sub_string_pointer)
+/**
+ * Sub-routine of parseLispExpression.
+ * This function gets a sub-string pointer by reference,
+ * and updates it as it parses the sub-string.
+ *
+ * @param
+ * 		const char** sub_string_pointer - Sub-string to parse.
+ *                                        This value is updated as the parsing is performed.
+ *
+ * @preconditions
+ *      sub_string_pointer != NULL && *sub_string_pointer != NULL
+ *
+ * @post-conditions
+ *      sub_string_pointer points to the end of the parsed sub-string,
+ *      i.e. after the closing ')' that matches the first opening '('.
+ *
+ * @return
+ *		Parse tree.
+ */
+Tree* parseLispExpression_(const char** sub_string_pointer)
 {
     VERIFY(sub_string_pointer != NULL && *sub_string_pointer != NULL);
+
     const char* c = *sub_string_pointer;
     VERIFY(*c == '(');
     c += 1;
@@ -54,7 +73,7 @@ Tree* parseLispExpression_(const char**sub_string_pointer)
     c =  strpbrk(c, "()");
     VERIFY(c != NULL);
 
-    /* Copy the expression head to a new buffer, and create a tree node with it. */
+    /* Copy the expression root to a new buffer, and create a tree node with it. */
     unsigned int expression_root_length = c - expression_root_start;
     char* expression_root = malloc(expression_root_length + 1);
     VERIFY(expression_root != NULL);
@@ -68,9 +87,10 @@ Tree* parseLispExpression_(const char**sub_string_pointer)
         addChild(tree, child);
         c = *sub_string_pointer;
     }
-    VERIFY(*c == ')');
 
+    VERIFY(*c == ')');
     *sub_string_pointer = c + 1;
+
     return tree;
 }
 
