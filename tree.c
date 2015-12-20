@@ -11,7 +11,11 @@
  * Types
  */
 
-/* TODO: Doc */
+/*
+ * Tree node data structure.
+ * Each tree node has a string value which it own's (and frees when the node is destroyed).
+ * children nodes are kept as an intrusive linked list.
+ */
 struct Tree
 {
     char* value;
