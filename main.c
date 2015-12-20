@@ -100,10 +100,10 @@ bool interact()
  */
 void getLine(char* buffer, unsigned int size)
 {
-    CHECK(buffer != NULL);
+    VERIFY(buffer != NULL);
     char* fgets_result = fgets(buffer, size, stdin);
-    CHECK(0 == ferror(stdin));
-    CHECK(fgets_result != NULL);
+    VERIFY(0 == ferror(stdin));
+    VERIFY(fgets_result != NULL);
 
     size_t last_char_index = strlen(buffer) - 1;
     if (buffer[last_char_index] == '\n') {
@@ -125,6 +125,6 @@ void getLine(char* buffer, unsigned int size)
  */
 bool isEndCommand(Tree* tree)
 {
-    CHECK(tree != NULL);
+    VERIFY(tree != NULL);
     return (!hasChildren(tree) && strcmp(getValue(tree), END_COMMAND) == 0);
 }

@@ -22,16 +22,16 @@ void printLisp_(Tree* tree);
 
 Tree* parseLispExpression(const char* string)
 {
-    CHECK(string != NULL);
+    VERIFY(string != NULL);
     Tree* tree = parseLispExpression_(&string);
     /* Check that the entire string was processed */
-    CHECK(*string == '\0');
+    VERIFY(*string == '\0');
     return tree;
 }
 
 void printLisp(Tree* tree)
 {
-    CHECK(tree != NULL);
+    VERIFY(tree != NULL);
     printLisp_(tree);
     printf("\n");
 }
@@ -44,20 +44,20 @@ void printLisp(Tree* tree)
 /* TODO: refactor to simplify somehow? */
 Tree* parseLispExpression_(const char**sub_string_pointer)
 {
-    CHECK(sub_string_pointer != NULL && *sub_string_pointer != NULL);
+    VERIFY(sub_string_pointer != NULL && *sub_string_pointer != NULL);
     const char* c = *sub_string_pointer;
-    CHECK(*c == '(');
+    VERIFY(*c == '(');
     c += 1;
 
     const char* expression_root_start = c;
     /* Search for first parenthesis */
     c =  strpbrk(c, "()");
-    CHECK(c != NULL);
+    VERIFY(c != NULL);
 
     /* Copy the expression head to a new buffer, and create a tree node with it. */
     unsigned int expression_root_length = c - expression_root_start;
     char* expression_root = malloc(expression_root_length + 1);
-    CHECK(expression_root != NULL);
+    VERIFY(expression_root != NULL);
     memcpy(expression_root, expression_root_start, expression_root_length);
     expression_root[expression_root_length] = '\0';
     Tree* tree = createTree(expression_root);
@@ -68,7 +68,7 @@ Tree* parseLispExpression_(const char**sub_string_pointer)
         addChild(tree, child);
         c = *sub_string_pointer;
     }
-    CHECK(*c == ')');
+    VERIFY(*c == ')');
 
     *sub_string_pointer = c + 1;
     return tree;
@@ -85,7 +85,7 @@ Tree* parseLispExpression_(const char**sub_string_pointer)
  */
 void printLisp_(Tree* tree)
 {
-    CHECK(tree != NULL);
+    VERIFY(tree != NULL);
     printf("(%s", getValue(tree));
     for (Tree* child = firstChild(tree);
          child != NULL;

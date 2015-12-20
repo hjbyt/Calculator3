@@ -9,9 +9,11 @@
  * Macros
  */
 
-/* TODO: doc */
-/* TODO: rename to VERIFY ? */
-#define CHECK(condition)    \
+/*
+ * Verify that a condition holds (i.e. evaluates to non-zero).
+ * If the condition doesn't hold, call panic.
+ */
+#define VERIFY(condition)    \
     do {                    \
         if (!(condition)) { \
             panic();        \

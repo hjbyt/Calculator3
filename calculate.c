@@ -40,14 +40,14 @@ bool isDigit(char c);
 
 double evaluateExpressionTree(Tree* tree)
 {
-    CHECK(tree != NULL);
+    VERIFY(tree != NULL);
 
     if (!hasChildren(tree)) {
         return evaluateNumberExpression(tree);
     }
 
     char* operator_string = getValue(tree);
-    CHECK(strlen(operator_string) == 1);
+    VERIFY(strlen(operator_string) == 1);
     char operator = *operator_string;
 
     switch (operator)
@@ -87,10 +87,10 @@ double evaluateExpressionTree(Tree* tree)
  */
 double evaluateNumberExpression(Tree* tree)
 {
-    CHECK(tree != NULL);
-    CHECK(!hasChildren(tree));
+    VERIFY(tree != NULL);
+    VERIFY(!hasChildren(tree));
     char* number_string = getValue(tree);
-    CHECK(isNumber(number_string));
+    VERIFY(isNumber(number_string));
     return (double)atoi(number_string);
 }
 
@@ -109,7 +109,7 @@ double evaluateNumberExpression(Tree* tree)
  */
 double evaluatePlusExpression(Tree* tree)
 {
-    CHECK(tree != NULL);
+    VERIFY(tree != NULL);
     switch (childrenCount(tree)) {
         case 1:
             return evaluateExpressionTree(firstChild(tree));
@@ -139,7 +139,7 @@ double evaluatePlusExpression(Tree* tree)
  */
 double evaluateMinusExpression(Tree* tree)
 {
-    CHECK(tree != NULL);
+    VERIFY(tree != NULL);
     switch (childrenCount(tree))
     {
         case 1:
@@ -170,8 +170,8 @@ double evaluateMinusExpression(Tree* tree)
  */
 double evaluateMultiplyExpression(Tree* tree)
 {
-    CHECK(tree != NULL);
-    CHECK(childrenCount(tree) == 2);
+    VERIFY(tree != NULL);
+    VERIFY(childrenCount(tree) == 2);
     double a = evaluateExpressionTree(firstChild(tree));
     double b = evaluateExpressionTree(lastChild(tree));
     return a * b;
@@ -193,8 +193,8 @@ double evaluateMultiplyExpression(Tree* tree)
  */
 double evaluateDivideExpression(Tree* tree)
 {
-    CHECK(tree != NULL);
-    CHECK(childrenCount(tree) == 2);
+    VERIFY(tree != NULL);
+    VERIFY(childrenCount(tree) == 2);
     double a = evaluateExpressionTree(firstChild(tree));
     double b = evaluateExpressionTree(lastChild(tree));
     if (b == 0) {
@@ -220,7 +220,7 @@ double evaluateDivideExpression(Tree* tree)
  */
 double evaluateSumRangeExpression(Tree* tree)
 {
-    CHECK(tree != NULL);
+    VERIFY(tree != NULL);
     long a = (long)evaluateExpressionTree(firstChild(tree));
     long b = (long)evaluateExpressionTree(lastChild(tree));
     if (a > b) {
@@ -245,7 +245,7 @@ double evaluateSumRangeExpression(Tree* tree)
  */
 long rangeSum(long a, long b)
 {
-    CHECK(a <= b);
+    VERIFY(a <= b);
     return (a + b) * (b - a + 1) / 2;
 }
 
@@ -264,7 +264,7 @@ long rangeSum(long a, long b)
  */
 bool isNumber(const char* string)
 {
-    CHECK(string != NULL);
+    VERIFY(string != NULL);
     const char* c = string;
 
     if (*c == '\0') {
