@@ -94,8 +94,6 @@ double evaluateNumberExpression(Tree* tree)
     return (double)atoi(number_string);
 }
 
-/* TODO: support plus operation over many operands?
- * e.g   (+(1)(2)(3)) -> reduce(+, [1,2,3]) -> 1+2+3 */
 /**
  * Evaluate a plus expression sub-tree.
  *
@@ -157,8 +155,6 @@ double evaluateMinusExpression(Tree* tree)
     }
 }
 
-/* TODO: support multiply operation over many operands?
- * e.g   (*(1)(2)(3)) -> reduce(*, [1,2,3]) -> 1*2*3 */
 /**
  * Evaluate a multiply expression sub-tree.
  *
