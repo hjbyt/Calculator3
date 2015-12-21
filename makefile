@@ -1,12 +1,15 @@
 all: 
 	cd SP; make all
 	$(MAKE) ex3
+	$(MAKE) test
 
 CC=gcc -std=c99 -Wall -Werror -pedantic-errors
-OBJECTS=main.o common.o calculate.o parse.o tree.o
 
-ex3: $(OBJECTS)
-	$(CC) $(OBJECTS) -o ex3
+ex3: main.o common.o calculate.o parse.o tree.o
+	$(CC) main.o common.o calculate.o parse.o tree.o -o ex3
+
+test: test.o common.o calculate.o parse.o tree.o
+	$(CC) test.o common.o calculate.o parse.o tree.o -o test
 
 main.o: main.c common.h tree.h parse.h calculate.h
 	$(CC) -c main.c
@@ -30,4 +33,4 @@ tree.h:
 
 clean:
 	cd SP; make clean
-	rm $(OBJECTS) ex3
+	rm -f main.o common.o calculate.o parse.o tree.o test.o ex3 test
