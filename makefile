@@ -5,11 +5,11 @@ all:
 
 CC=gcc -std=c99 -Wall -Werror -pedantic-errors
 
-ex3: main.o common.o calculate.o parse.o tree.o
-	$(CC) main.o common.o calculate.o parse.o tree.o -o ex3
+ex3: main.o common.o calculate.o parse.o tree.o SPList.o SPListElement.o hashtable.o
+	$(CC) main.o common.o calculate.o parse.o tree.o SPList.o SPListElement.o hashtable.o -o ex3
 
-test: test.o common.o calculate.o parse.o tree.o
-	$(CC) test.o common.o calculate.o parse.o tree.o -o test
+test: test.o common.o calculate.o parse.o tree.o SPList.o SPListElement.o hashtable.o
+	$(CC) test.o common.o calculate.o parse.o tree.o SPList.o SPListElement.o hashtable.o -o test
 
 main.o: main.c common.h tree.h parse.h calculate.h
 	$(CC) -c main.c
@@ -25,12 +25,24 @@ tree.o: tree.c tree.h common.h
 
 common.o: common.c common.h
 	$(CC) -c common.c
+	
+SPList.o: SPList.h SPList.c
+	$(CC) -c SPList.c
+	
+SPListElement.o: SPListElement.h SPListElement.c
+	$(CC) -c SPListElement.c
+	
+hashtable.o: hashtable.h hashtable.c
+	$(CC) -c hashtable.c
 
 common.h:
 calculate.h: tree.h
 parse.h: tree.h
 tree.h:
+SPList.h:
+SPListElement.h:
+hashtable.h:
 
 clean:
 	cd SP; make clean
-	rm -f main.o common.o calculate.o parse.o tree.o test.o ex3 test
+	rm -f main.o common.o calculate.o parse.o tree.o test.o SPList.o SPListElement.o hashtable.o ex3 test

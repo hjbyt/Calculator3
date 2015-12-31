@@ -20,6 +20,10 @@
         }                   \
     } while (0)
 
+
+#define IN
+#define OUT
+
 /*
  * Functions
  */

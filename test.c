@@ -9,6 +9,7 @@
 #include "tree.h"
 #include "parse.h"
 #include "calculate.h"
+#include "hashtable.h"
 
 #define FAIL(msg)                                                       \
     do {                                                                \
@@ -155,12 +156,71 @@ void test_calculate()
     ASSERT(isnan((float)evaluateLispExpression("(-(+(1)(*(*(-(-(+(2))))($(3)(5)))(-(6))))(/(/(4)($(2)(1)))(+(1)(4))))")));
 }
 
+void test_hashtable() 
+{
+    HashTable table = createHashTable();
+    ASSERT(!nameExists(table, "first"));
+    insertValue(table, "first", 5);
+    insertValue(table, "second", 5.5);
+    insertValue(table, "pi", 3.1415);
+    insertValue(table, "e", 2.71828);
+    ASSERT(2.71828 == getValueByName(table, "e"));
+    ASSERT(3.1415 == getValueByName(table, "pi"));
+    ASSERT(5 == getValueByName(table, "first"));
+    ASSERT(5.5 == getValueByName(table, "second"));
+    ASSERT(nameExists(table, "first"));
+    setValue(table, "first", 6);
+    setValue(table, "second", 9);
+    ASSERT(2.71828 == getValueByName(table, "e"));
+    ASSERT(3.1415 == getValueByName(table, "pi"));
+    ASSERT(6 == getValueByName(table, "first"));
+    ASSERT(9 == getValueByName(table, "second"));
+    ASSERT(nameExists(table, "first"));
+    deleteByName(table, "first");
+    deleteByName(table, "second");
+    ASSERT(2.71828 == getValueByName(table, "e"));
+    ASSERT(3.1415 == getValueByName(table, "pi"));
+    ASSERT(!nameExists(table, "first"));
+    destroyHashTable(table);
+    
+    HashTable table2 = createHashTable();
+    
+    ASSERT(!nameExists(table2, "YYHMYZ"));
+    insertValue(table2, "0UDBZE", 1);
+    ASSERT(!nameExists(table2, "YYHMYZ"));
+    insertValue(table2, "YYHMYZ", 2);
+    ASSERT(nameExists(table2, "YYHMYZ"));
+    insertValue(table2, "U4BQBV", 3);
+    insertValue(table2, "2V66VL", 4);
+    insertValue(table2, "PNTKJK", 5);
+    ASSERT(1 == getValueByName(table2, "0UDBZE"));
+    ASSERT(2 == getValueByName(table2, "YYHMYZ"));
+    ASSERT(3 == getValueByName(table2, "U4BQBV"));
+    ASSERT(4 == getValueByName(table2, "2V66VL"));
+    ASSERT(5 == getValueByName(table2, "PNTKJK"));
+    setValue(table2, "0UDBZE", 10);
+    setValue(table2, "YYHMYZ", 20);
+    ASSERT(nameExists(table2, "YYHMYZ"));
+    ASSERT(10 == getValueByName(table2, "0UDBZE"));
+    ASSERT(20 == getValueByName(table2, "YYHMYZ"));
+    ASSERT(3 == getValueByName(table2, "U4BQBV"));
+    ASSERT(4 == getValueByName(table2, "2V66VL"));
+    ASSERT(5 == getValueByName(table2, "PNTKJK"));
+    deleteByName(table2, "2V66VL");
+    deleteByName(table2, "PNTKJK");
+    ASSERT(10 == getValueByName(table2, "0UDBZE"));
+    ASSERT(20 == getValueByName(table2, "YYHMYZ"));
+    ASSERT(3 == getValueByName(table2, "U4BQBV"));
+    destroyHashTable(table2);
+}
+
 int main()
 {
     printf("Running Tests...\n");
     test_tree();
     test_parse();
     test_calculate();
+    test_hashtable();
     printf("All Tests Passed.\n");
 
     return EXIT_SUCCESS;
@@ -193,3 +253,31 @@ bool fp_eq(double a, double b)
     const double epsilon = 0.000001;
     return (fabs(a-b) <= epsilon);
 }
+
+/**
+This is a python program to generate hash collisions for the hash table tests
+
+def h(s):
+    i = 571
+    cp = 31
+    for c in s:
+        i = cp * i + ord(c)
+        i = i % 100
+    return i
+
+>>> h('find_colision')
+5
+import random
+import string
+i = 0
+while i < 5:
+    s = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+    if h(s) == 57:
+    print s
+    i += 1
+0UDBZE
+PNTKJK
+2V66VL
+U4BQBV
+YYHMYZ
+*/
