@@ -6,16 +6,16 @@ all:
 CC=gcc -std=c99 -Wall -Werror -pedantic-errors
 
 ex3: main.o common.o calculate.o parse.o tree.o SPList.o SPListElement.o hashtable.o
-	$(CC) main.o common.o calculate.o parse.o tree.o SPList.o SPListElement.o hashtable.o -o ex3
+	$(CC) main.o common.o calculate.o parse.o tree.o SPList.o SPListElement.o hashtable.o -o ex3 -lm
 
 test: test.o common.o calculate.o parse.o tree.o SPList.o SPListElement.o hashtable.o
-	$(CC) test.o common.o calculate.o parse.o tree.o SPList.o SPListElement.o hashtable.o -o test
+	$(CC) test.o common.o calculate.o parse.o tree.o SPList.o SPListElement.o hashtable.o -o test -lm
 
 main.o: main.c common.h tree.h parse.h calculate.h
 	$(CC) -c main.c
 
 calculate.o: calculate.c calculate.h
-	$(CC) -c calculate.c
+	$(CC) -c calculate.c -lm
 
 parse.o: parse.c parse.h common.h
 	$(CC) -c parse.c

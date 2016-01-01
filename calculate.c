@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <float.h>
 #include <math.h>
 #include "calculate.h"
 #include "common.h"
@@ -30,6 +31,8 @@ double evaluateMinusExpression(Tree* tree);
 double evaluateMultiplyExpression(Tree* tree);
 double evaluateDivideExpression(Tree* tree);
 double evaluateSumRangeExpression(Tree* tree);
+double evaluateMinExpression(Tree* tree);
+double evaluateMaxExpression(Tree* tree);
 long rangeSum(long a, long b);
 bool isNumber(const char* string);
 bool isDigit(char c);
@@ -47,22 +50,31 @@ double evaluateExpressionTree(Tree* tree)
     }
 
     char* operator_string = getValue(tree);
-    VERIFY(strlen(operator_string) == 1);
-    char operator = *operator_string;
+    
+    if (strlen(operator_string) == 1) {
+        char operator = *operator_string;
 
-    switch (operator)
-    {
-        case PLUS_OPERATION:
-            return evaluatePlusExpression(tree);
-        case MINUS_OPERATION:
-            return evaluateMinusExpression(tree);
-        case MULTIPLY_OPERATION:
-            return evaluateMultiplyExpression(tree);
-        case DIVIDE_OPERATION:
-            return evaluateDivideExpression(tree);
-        case SUM_RANGE_OPERATION:
-            return evaluateSumRangeExpression(tree);
-        default:
+        switch (operator)
+        {
+            case PLUS_OPERATION:
+                return evaluatePlusExpression(tree);
+            case MINUS_OPERATION:
+                return evaluateMinusExpression(tree);
+            case MULTIPLY_OPERATION:
+                return evaluateMultiplyExpression(tree);
+            case DIVIDE_OPERATION:
+                return evaluateDivideExpression(tree);
+            case SUM_RANGE_OPERATION:
+                return evaluateSumRangeExpression(tree);
+            default:
+                panic();
+        }    
+    } else {
+        if (strcmp(operator_string, "min"))
+            return evaluateMinExpression(tree);
+        else if (strcmp(operator_string, "max"))
+            return evaluateMaxExpression(tree);
+        else
             panic();
     }
 }
@@ -221,6 +233,7 @@ double evaluateDivideExpression(Tree* tree)
 double evaluateSumRangeExpression(Tree* tree)
 {
     VERIFY(tree != NULL);
+    VERIFY(childrenCount(tree) == 2);
     long a = (long)evaluateExpressionTree(firstChild(tree));
     long b = (long)evaluateExpressionTree(lastChild(tree));
     if (a > b) {
@@ -228,6 +241,38 @@ double evaluateSumRangeExpression(Tree* tree)
     } else {
         return rangeSum(a, b);
     }
+}
+
+double evaluateMinExpression(Tree* tree)
+{
+    VERIFY(NULL != tree);
+    VERIFY(hasChildren(tree));
+    Tree* child = firstChild(tree);
+    double minValue = DBL_MAX;
+    
+    while (child) {
+        double current = evaluateExpressionTree(child);
+        minValue = fmin(minValue, current);
+        child = nextBrother(child);
+    }
+    
+    return minValue;
+}
+
+double evaluateMaxExpression(Tree* tree)
+{
+    VERIFY(NULL != tree);
+    VERIFY(hasChildren(tree));
+    Tree* child = firstChild(tree);
+    double maxValue = -DBL_MAX;
+    
+    while (child) {
+        double current = evaluateExpressionTree(child);
+        maxValue = fmax(maxValue, current);
+        child = nextBrother(child);
+    }
+    
+    return maxValue;
 }
 
 /**
