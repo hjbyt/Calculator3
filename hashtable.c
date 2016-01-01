@@ -11,6 +11,7 @@
 
 struct HashTable_t {
     SPList buckets[NUMBER_OF_ENTRIES];
+    int numberOfValues;
 };
 
 typedef enum HashTableResult_e {
@@ -21,10 +22,9 @@ typedef enum HashTableResult_e {
 } HashTableResult;
 
 typedef enum LookupOperation_e {
-    CREATE,
+    INSERT,
     DELETE,
     GET,
-    SET,
 } LookupOperation;
 
 HashTableResult lookupElementByName(HashTable table, char* name, LookupOperation operation, OUT SPListElement* element);
@@ -39,19 +39,21 @@ HashTable createHashTable() {
         table->buckets[i] = listCreate();
         VERIFY(NULL != table->buckets[i]);
     }
+    table->numberOfValues = 0;
     
     return table;
 }
 
-void insertValue(HashTable table, char* name, double value) {
+void hashInsert(HashTable table, char* name, double value) {
     SPListElement newElement;
-    HashTableResult result = lookupElementByName(table, name, CREATE, &newElement);
+    HashTableResult result = lookupElementByName(table, name, INSERT, &newElement);
     VERIFY(HT_SUCCESS == result);
     
     setELementValue(newElement, value);
+    table->numberOfValues++;
 }
 
-double getValueByName(HashTable table, char* name) {
+double hashGetValue(HashTable table, char* name) {
     SPListElement foundElement;
     HashTableResult result = lookupElementByName(table, name, GET, &foundElement);
     VERIFY(HT_SUCCESS == result);
@@ -61,25 +63,25 @@ double getValueByName(HashTable table, char* name) {
     return *foundValue;
 }
 
-void setValue(HashTable table, char* name, double value) {
-    SPListElement foundElement;
-    HashTableResult result = lookupElementByName(table, name, SET, &foundElement);
-    VERIFY(HT_SUCCESS == result);
-    
-    SPElementResult elementResult = setELementValue(foundElement, value);
-    VERIFY(SP_ELEMENT_SUCCESS == elementResult);
-}
-
-void deleteByName(HashTable table, char* name) {
+void hashDelete(HashTable table, char* name) {
     SPListElement foundElement;
     HashTableResult result = lookupElementByName(table, name, DELETE, &foundElement);
     VERIFY(HT_SUCCESS == result);
+    table->numberOfValues--;
 }
 
-bool nameExists(HashTable table, char* name) {
+bool hashContains(HashTable table, char* name) {
     SPListElement foundElement;
     HashTableResult result = lookupElementByName(table, name, GET, &foundElement);
     return (HT_SUCCESS == result);
+}
+
+int hashGetSize(HashTable table) {
+    return table->numberOfValues;
+}
+
+bool hashIsEmpty(HashTable table) {
+    return (table->numberOfValues != 0);
 }
 
 void destroyHashTable(HashTable table) {
@@ -119,21 +121,18 @@ HashTableResult lookupElementByName(HashTable table, char* name, LookupOperation
     
     LIST_FOREACH(SPListElement, i, bucket) {
         if (isElementStrEquals(i, name)) {
-            if (CREATE == operation) {
-                return HT_ELEMENT_ALREADY_EXSITS;
-            }
-            else if (DELETE == operation) {
+            if (DELETE == operation) {
                 listRemoveCurrent(bucket);
                 return HT_SUCCESS;
             }
-            else if (GET == operation || SET == operation) {
+            else if (INSERT == operation || GET == operation) {
                 *element = listGetCurrent(bucket);
                 return HT_SUCCESS;   
             }
         }
     }
     
-    if (CREATE != operation) {
+    if (INSERT != operation) {
         return HT_VALUE_DOES_NOT_EXIST;
     }
     

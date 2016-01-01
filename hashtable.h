@@ -19,15 +19,17 @@ typedef struct HashTable_t * HashTable;
  */
 HashTable createHashTable();
 
-void insertValue(HashTable table, char* name, double value);
+void hashInsert(HashTable table, char* name, double value);
 
-double getValueByName(HashTable table, char* name);
+double hashGetValue(HashTable table, char* name);
 
-void setValue(HashTable table, char* name, double value);
+void hashDelete(HashTable table, char* name);
 
-void deleteByName(HashTable table, char* name);
+bool hashContains(HashTable table, char* name);
 
-bool nameExists(HashTable table, char* name);
+int hashGetSize(HashTable table);
+
+bool hashIsEmpty(HashTable table);
 
 /**
  * destroyHashTable: Deallocates an existing hash table. Clears all elements by using the
