@@ -50,7 +50,6 @@ void hashInsert(HashTable table, char* name, double value) {
     VERIFY(HT_SUCCESS == result);
     
     setELementValue(newElement, value);
-    table->numberOfValues++;
 }
 
 double hashGetValue(HashTable table, char* name) {
@@ -67,7 +66,6 @@ void hashDelete(HashTable table, char* name) {
     SPListElement foundElement;
     HashTableResult result = lookupElementByName(table, name, DELETE, &foundElement);
     VERIFY(HT_SUCCESS == result);
-    table->numberOfValues--;
 }
 
 bool hashContains(HashTable table, char* name) {
@@ -77,11 +75,13 @@ bool hashContains(HashTable table, char* name) {
 }
 
 int hashGetSize(HashTable table) {
+    VERIFY(NULL != table);
     return table->numberOfValues;
 }
 
 bool hashIsEmpty(HashTable table) {
-    return (table->numberOfValues != 0);
+    VERIFY(NULL != table);
+    return (table->numberOfValues == 0);
 }
 
 void destroyHashTable(HashTable table) {
@@ -115,6 +115,8 @@ int hash(const char* str) {
 }
 
 HashTableResult lookupElementByName(HashTable table, char* name, LookupOperation operation, OUT SPListElement* element) {
+    VERIFY(NULL != table);
+    
     int nameHash = hash(name);
     SPList bucket = table->buckets[nameHash];
     *element = NULL;
@@ -122,6 +124,7 @@ HashTableResult lookupElementByName(HashTable table, char* name, LookupOperation
     LIST_FOREACH(SPListElement, i, bucket) {
         if (isElementStrEquals(i, name)) {
             if (DELETE == operation) {
+                table->numberOfValues--;
                 listRemoveCurrent(bucket);
                 return HT_SUCCESS;
             }
@@ -143,6 +146,7 @@ HashTableResult lookupElementByName(HashTable table, char* name, LookupOperation
     VERIFY(SP_LIST_SUCCESS == listResult);
     listGetFirst(bucket);
     *element = listGetCurrent(bucket);
+    table->numberOfValues++;
     
     return HT_SUCCESS;
 }

@@ -160,10 +160,14 @@ void test_hashtable()
 {
     HashTable table = createHashTable();
     ASSERT(!hashContains(table, "first"));
+    ASSERT(0 == hashGetSize(table));
+    ASSERT(hashIsEmpty(table));
     hashInsert(table, "first", 5);
     hashInsert(table, "second", 5.5);
     hashInsert(table, "pi", 3.1415);
     hashInsert(table, "e", 2.71828);
+    ASSERT(4 == hashGetSize(table));
+    ASSERT(!hashIsEmpty(table));
     ASSERT(2.71828 == hashGetValue(table, "e"));
     ASSERT(3.1415 == hashGetValue(table, "pi"));
     ASSERT(5 == hashGetValue(table, "first"));
@@ -171,6 +175,7 @@ void test_hashtable()
     ASSERT(hashContains(table, "first"));
     hashInsert(table, "first", 6);
     hashInsert(table, "second", 9);
+    ASSERT(4 == hashGetSize(table));
     ASSERT(2.71828 == hashGetValue(table, "e"));
     ASSERT(3.1415 == hashGetValue(table, "pi"));
     ASSERT(6 == hashGetValue(table, "first"));
@@ -178,6 +183,8 @@ void test_hashtable()
     ASSERT(hashContains(table, "first"));
     hashDelete(table, "first");
     hashDelete(table, "second");
+    ASSERT(2 == hashGetSize(table));
+    ASSERT(!hashIsEmpty(table));
     ASSERT(2.71828 == hashGetValue(table, "e"));
     ASSERT(3.1415 == hashGetValue(table, "pi"));
     ASSERT(!hashContains(table, "first"));
