@@ -13,8 +13,13 @@
  * Constants
  */
 
-#define MAX_LINE_LENGTH 1024
+
 const char* DELIMITERS = " \t";
+#define END_COMMAND "<>"
+
+const char* UNARY_OR_BINARY_OPERATORS[] = {"+", "-"};
+const char* BINARY_OPERATORS[] = {"*", "/", "$", "="};
+const char* FUNCTION_OPERATIONS[] = {"max", "min"};
 
 /*
  * Internal Function Declarations
@@ -22,6 +27,13 @@ const char* DELIMITERS = " \t";
 
 Tree* parseLispExpression_(const char** sub_string_pointer);
 void printLisp_(Tree* tree);
+
+void expressionToString_(Tree* tree, char** buffer_pointer, char* buffer_end);
+void terminalExpressionToString(Tree* tree, char** buffer_pointer, char* buffer_end);
+void unaryOperatorExpressionToString(Tree* tree, char** buffer_pointer, char* buffer_end);
+void binaryOperatorExpressionToString(Tree* tree, char** buffer_pointer, char* buffer_end);
+void functionExpressionToString(Tree* tree, char** buffer_pointer, char* buffer_end);
+
 bool isName(char* string);
 bool isLetter(char c);
 
@@ -44,6 +56,28 @@ void printLisp(Tree* tree)
     VERIFY(tree != NULL);
     printLisp_(tree);
     printf("\n");
+}
+
+bool isEndCommand(Tree* tree)
+{
+    VERIFY(tree != NULL);
+    return (!hasChildren(tree) && strcmp(getValue(tree), END_COMMAND) == 0);
+}
+
+void expressionToString(Tree* tree, char* buffer, unsigned int buffer_size)
+{
+    VERIFY(tree != NULL);
+    VERIFY(buffer != NULL);
+
+    if (isEndCommand(tree)) {
+        VERIFY(buffer_size > 4);
+        strcpy(buffer, "(<>)");
+        return;
+    }
+
+    /* TODO: explain the memset */
+    memset(buffer, 0, buffer_size);
+    expressionToString_(tree, &buffer, buffer + buffer_size);
 }
 
 void parseVariableInputFile(FILE* input_file, HashTable table)
@@ -176,6 +210,113 @@ void printLisp_(Tree* tree)
         printLisp_(child);
     }
     printf(")");
+}
+
+/* TODO: doc */
+void expressionToString_(Tree* tree, char** buffer_pointer, char* buffer_end)
+{
+    VERIFY(tree != NULL);
+    VERIFY(buffer_pointer != NULL && *buffer_pointer != NULL);
+
+    unsigned int children_count = childrenCount(tree);
+    if (children_count == 0) {
+        terminalExpressionToString(tree, buffer_pointer, buffer_end);
+    } else {
+        char* operation = getValue(tree);
+        if (IS_STRING_IN_ARRAY(operation, UNARY_OR_BINARY_OPERATORS)) {
+            if (children_count == 1) {
+                unaryOperatorExpressionToString(tree, buffer_pointer, buffer_end);
+            } else if (children_count == 2) {
+                binaryOperatorExpressionToString(tree, buffer_pointer, buffer_end);
+            } else {
+                panic();
+            }
+        } else if (IS_STRING_IN_ARRAY(operation, BINARY_OPERATORS)) {
+            VERIFY(children_count == 2);
+            binaryOperatorExpressionToString(tree, buffer_pointer, buffer_end);
+        } else if (IS_STRING_IN_ARRAY(operation, FUNCTION_OPERATIONS)) {
+            functionExpressionToString(tree, buffer_pointer, buffer_end);
+        } else {
+            panic();
+        }
+    }
+}
+
+void appendToBuffer(char* appendage, char** buffer_pointer, char* buffer_end)
+{
+    VERIFY(buffer_pointer != NULL);
+    char* buffer = *buffer_pointer;
+    VERIFY(buffer != NULL);
+
+    unsigned int buffer_size = buffer_end - buffer;
+    size_t appendage_length = strlen(appendage);
+    VERIFY(buffer_size > appendage_length);
+
+    memcpy(buffer, appendage, appendage_length);
+    buffer += appendage_length;
+    *buffer_pointer = buffer;
+}
+
+/* TODO: doc */
+void terminalExpressionToString(Tree* tree, char** buffer_pointer, char* buffer_end)
+{
+    VERIFY(tree != NULL);
+    VERIFY(buffer_pointer != NULL);
+    VERIFY(childrenCount(tree) == 0);
+
+    char* terminal = getValue(tree);
+    appendToBuffer(terminal, buffer_pointer, buffer_end);
+}
+
+/* TODO: doc */
+void unaryOperatorExpressionToString(Tree* tree, char** buffer_pointer, char* buffer_end)
+{
+    VERIFY(tree != NULL);
+    VERIFY(buffer_pointer != NULL);
+    VERIFY(childrenCount(tree) == 1);
+
+    /* TODO: wrap unary expression with () ?*/
+    char* operator = getValue(tree);
+    appendToBuffer(operator, buffer_pointer, buffer_end);
+    expressionToString_(firstChild(tree), buffer_pointer, buffer_end);
+}
+
+/* TODO: doc */
+void binaryOperatorExpressionToString(Tree* tree, char** buffer_pointer, char* buffer_end)
+{
+    VERIFY(tree != NULL);
+    VERIFY(buffer_pointer != NULL);
+    VERIFY(childrenCount(tree) == 2);
+
+    appendToBuffer("(", buffer_pointer, buffer_end);
+    expressionToString_(firstChild(tree), buffer_pointer, buffer_end);
+    char* operator = getValue(tree);
+    appendToBuffer(operator, buffer_pointer, buffer_end);
+    expressionToString_(lastChild(tree), buffer_pointer, buffer_end);
+    appendToBuffer(")", buffer_pointer, buffer_end);
+}
+
+/* TODO: doc */
+void functionExpressionToString(Tree* tree, char** buffer_pointer, char* buffer_end)
+{
+    VERIFY(tree != NULL);
+    VERIFY(buffer_pointer != NULL);
+    VERIFY(childrenCount(tree) >= 1);
+
+    char* function = getValue(tree);
+    appendToBuffer(function, buffer_pointer, buffer_end);
+
+    appendToBuffer("(", buffer_pointer, buffer_end);
+
+    Tree* child = firstChild(tree);
+    expressionToString_(child, buffer_pointer, buffer_end);
+    for (child = nextBrother(child); child != NULL; child = nextBrother(child))
+    {
+        appendToBuffer(", ", buffer_pointer, buffer_end);
+        expressionToString_(child, buffer_pointer, buffer_end);
+    }
+
+    appendToBuffer(")", buffer_pointer, buffer_end);
 }
 
 /* TODO: doc */

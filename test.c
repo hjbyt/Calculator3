@@ -9,7 +9,6 @@
 #include "tree.h"
 #include "parse.h"
 #include "calculate.h"
-#include "hashtable.h"
 
 #define FAIL(msg)                                                       \
     do {                                                                \
@@ -250,6 +249,52 @@ void test_variable_file_parsing()
     destroyHashTable(table);
 }
 
+void test_expression_to_string()
+{
+    char buffer[100];
+    Tree* tree;
+
+    tree = parseLispExpression("(+(5)(2))");
+    expressionToString(tree, buffer, sizeof(buffer));
+    ASSERT_EQ_STR(buffer, "(5+2)");
+    destroyTree(tree);
+
+    tree = parseLispExpression("(=(a)(3))");
+    expressionToString(tree, buffer, sizeof(buffer));
+    ASSERT_EQ_STR(buffer, "(a=3)");
+    destroyTree(tree);
+
+    tree = parseLispExpression("(+(a)(*(3)(2)))");
+    expressionToString(tree, buffer, sizeof(buffer));
+    ASSERT_EQ_STR(buffer, "(a+(3*2))");
+    destroyTree(tree);
+
+    tree = parseLispExpression("(=(b)(+(a)(1)))");
+    expressionToString(tree, buffer, sizeof(buffer));
+    ASSERT_EQ_STR(buffer, "(b=(a+1))");
+    destroyTree(tree);
+
+    tree = parseLispExpression("(<>)");
+    expressionToString(tree, buffer, sizeof(buffer));
+    ASSERT_EQ_STR(buffer, "(<>)");
+    destroyTree(tree);
+
+    tree = parseLispExpression("(-(1))");
+    expressionToString(tree, buffer, sizeof(buffer));
+    ASSERT_EQ_STR(buffer, "-1"); /* TODO: is this the right string to expect ? */
+    destroyTree(tree);
+
+    tree = parseLispExpression("(+(+(-(+(-(2))))))");
+    expressionToString(tree, buffer, sizeof(buffer));
+    ASSERT_EQ_STR(buffer, "++-+-2"); /* TODO: is this the right string to expect ? */
+    destroyTree(tree);
+
+    tree = parseLispExpression("(max(5)(32)(+(17)(5)))");
+    expressionToString(tree, buffer, sizeof(buffer));
+    ASSERT_EQ_STR(buffer, "max(5, 32, (17+5))"); /* TODO: is this the right string to expect ? */
+    destroyTree(tree);
+}
+
 int main()
 {
     printf("Running Tests...\n");
@@ -258,6 +303,7 @@ int main()
     test_calculate();
     test_hashtable();
     test_variable_file_parsing();
+    test_expression_to_string();
     printf("All Tests Passed.\n");
 
     return EXIT_SUCCESS;
