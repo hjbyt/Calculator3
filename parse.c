@@ -10,11 +10,20 @@
 #include "common.h"
 
 /*
+ * Constants
+ */
+
+#define MAX_LINE_LENGTH 1024
+const char* DELIMITERS = " \t";
+
+/*
  * Internal Function Declarations
  */
 
 Tree* parseLispExpression_(const char** sub_string_pointer);
 void printLisp_(Tree* tree);
+bool isName(char* string);
+bool isLetter(char c);
 
 /*
  * Module Functions
@@ -35,6 +44,59 @@ void printLisp(Tree* tree)
     VERIFY(tree != NULL);
     printLisp_(tree);
     printf("\n");
+}
+
+void parseVariableInputFile(FILE* input_file, HashTable table)
+{
+    VERIFY(input_file != NULL);
+    VERIFY(table != NULL);
+
+    while (!feof(input_file))
+    {
+        /* Get line */
+        char line[MAX_LINE_LENGTH + 1];
+        fgets(line, sizeof(line), input_file);
+        VERIFY(!ferror(input_file));
+
+        parseVariableAssignmentLine(line, table);
+    }
+}
+
+void parseVariableAssignmentLine(char* line, HashTable table)
+{
+    VERIFY(line != NULL);
+    VERIFY(table != NULL);
+
+    /* Parse name */
+    char* token = strtok(line, DELIMITERS);
+    VERIFY(token != NULL);
+    VERIFY(isName(token));
+    char* name = token;
+
+    /* Parse '=' */
+    token = strtok(NULL, DELIMITERS);
+    VERIFY(token != NULL);
+    VERIFY(strcmp(token, "=") == 0);
+
+    /* Parse number */
+    token = strtok(NULL, DELIMITERS);
+    VERIFY(token != NULL);
+    errno = 0;
+    long int value = strtol(token, &token, 10);
+    VERIFY(errno == 0);
+
+    /* Make sure the number token was completely processed */
+    char current_char = *token;
+    VERIFY(   current_char == ' '
+           || current_char == '\t'
+           || current_char == '\n'
+           || current_char == '\0');
+
+    /* Make sure there are no remaining tokens */
+    token = strtok(NULL, DELIMITERS);
+    VERIFY(token == NULL);
+
+    hashInsert(table, name, (double)value);
 }
 
 /*
@@ -114,4 +176,23 @@ void printLisp_(Tree* tree)
         printLisp_(child);
     }
     printf(")");
+}
+
+/* TODO: doc */
+bool isName(char* string)
+{
+    VERIFY(string != NULL);
+    for (char *c = string; *c != '\0'; c++)
+    {
+        if (!isLetter(*c)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/* TODO: doc */
+bool isLetter(char c)
+{
+    return (c >= 'A') && (c <= 'z');
 }

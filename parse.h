@@ -6,6 +6,7 @@
 #define PARSE_H_
 
 #include "tree.h"
+#include "hashtable.h"
 
 /**
  * Parse a Lisp expression of the form: (str<Child_1><Child2>...<Child_n>)
@@ -37,5 +38,11 @@ Tree* parseLispExpression(const char* string);
  *      tree != NULL
  */
 void printLisp(Tree* tree);
+
+/* TODO: doc */
+void parseVariableInputFile(FILE* input_file, HashTable table);
+
+/* TODO: doc */
+void parseVariableAssignmentLine(char* line, HashTable table);
 
 #endif /* PARSE_H_ */

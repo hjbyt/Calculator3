@@ -221,6 +221,35 @@ void test_hashtable()
     destroyHashTable(table2);
 }
 
+void test_variable_file_parsing()
+{
+    HashTable table = createHashTable();
+
+    ASSERT(hashGetSize(table) == 0);
+
+    char line[100] = "aaa = 111";
+    parseVariableAssignmentLine(line, table);
+    ASSERT(hashGetSize(table) == 1);
+    ASSERT(fp_eq(111, hashGetValue(table, "aaa")));
+
+    strcpy(line, "aaa  \t  = \t 222");
+    parseVariableAssignmentLine(line, table);
+    ASSERT(hashGetSize(table) == 1);
+    ASSERT(fp_eq(222, hashGetValue(table, "aaa")));
+
+    strcpy(line, "bBb = 333\n");
+    parseVariableAssignmentLine(line, table);
+    ASSERT(hashGetSize(table) == 2);
+    ASSERT(fp_eq(333, hashGetValue(table, "bBb")));
+
+    strcpy(line, "aaa = -444");
+    parseVariableAssignmentLine(line, table);
+    ASSERT(hashGetSize(table) == 2);
+    ASSERT(fp_eq(-444, hashGetValue(table, "aaa")));
+
+    destroyHashTable(table);
+}
+
 int main()
 {
     printf("Running Tests...\n");
@@ -228,6 +257,7 @@ int main()
     test_parse();
     test_calculate();
     test_hashtable();
+    test_variable_file_parsing();
     printf("All Tests Passed.\n");
 
     return EXIT_SUCCESS;
