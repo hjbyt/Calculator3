@@ -22,6 +22,12 @@ package SP;
 			return ctx.tree.getLisp();
 		}
 	}
+	
+	public void AddAll(SPTree root, List<SPTree> children) {
+		for (int i = 0; i < children.size(); i++) {
+			root.insertChild(children.get(i));
+		}
+	}
 }
 
 //Valid statement is either a termination command || an arithmetical expression
@@ -34,6 +40,8 @@ exp returns [SPTree tree] :
 			   n=NUMBER {$tree = new SPTree($n.text);}
 			  // Sub-expression
 			  | LEFT_PARENTHESIS e1=exp RIGHT_PARENTHESIS {$tree = $e1.tree;}
+			  // Min\Max operations
+			  | c=(MIN|MAX) e=expList {$tree = new SPTree($c.text); AddAll($tree, $e.children); }
 			  // Unary operation
 			  | c=(PLUS|MINUS) e1=exp               {$tree = new SPTree($c.text); $tree.insertChild($e1.tree);}
 			  // Binary operation
@@ -41,6 +49,15 @@ exp returns [SPTree tree] :
 			  | e1=exp c=(MULPTIPLY|DIVIDE)  e2=exp {$tree = new SPTree($c.text); $tree.insertChild($e1.tree); $tree.insertChild($e2.tree);}
 			  | e1=exp c=(PLUS|MINUS)        e2=exp {$tree = new SPTree($c.text); $tree.insertChild($e1.tree); $tree.insertChild($e2.tree);}
 			  ;
+			  
+expList returns [ ArrayList<SPTree> children ]
+    @init
+    {
+    	$children = new ArrayList<SPTree>();
+    } :
+    LEFT_PARENTHESIS e1=exp {$children.add(new SPTree($e1.text));} (COMMA e2=exp {$children.add(new SPTree($e2.text));})* RIGHT_PARENTHESIS
+    ;
+		
 
 // parser rules start with lowercase letters, lexer rules with uppercase
 TERMINATION: '<>';
@@ -58,6 +75,9 @@ MINUS : '-';
 MULPTIPLY: '*';
 DIVIDE: '/';
 SUM_RANGE: '$';
+MIN: 'min';
+MAX: 'max';
+COMMA: ',';
 
 // Ignore whitespace
 WHITESPACE: [ \t\r\n]+ -> skip;
