@@ -10,5 +10,3 @@ clean:
 	rm -f SPCalculatorParser.class  SPCalculatorParser.java SPCalculatorListener.class SPCalculatorListener.java \
 SPCalculatorLexer.class  SPCalculatorLexer.java SPTree.class SPCalculatorBaseListener.class  SPCalculatorBaseListener.java SPCalculatorMain.class \
 SPCalculatorLexer.tokens SPCalculator.tokens
-
-

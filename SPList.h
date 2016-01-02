@@ -1,7 +1,7 @@
 #ifndef SPLIST_H_
 #define SPLIST_H_
 
-#include "stdbool.h"
+#include <stdbool.h>
 #include "SPListElement.h"
 /**
  * List Container

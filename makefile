@@ -1,12 +1,12 @@
 all: 
 	cd SP; make all
-	$(MAKE) ex3
+	$(MAKE) SPCalculator
 	$(MAKE) test
 
 CC=gcc -std=c99 -Wall -Werror -pedantic-errors
 
-ex3: main.o common.o calculate.o parse.o tree.o SPList.o SPListElement.o hashtable.o
-	$(CC) main.o common.o calculate.o parse.o tree.o SPList.o SPListElement.o hashtable.o -o ex3 -lm
+SPCalculator: main.o common.o calculate.o parse.o tree.o SPList.o SPListElement.o hashtable.o
+	$(CC) main.o common.o calculate.o parse.o tree.o SPList.o SPListElement.o hashtable.o -o SPCalculator -lm
 
 test: test.o common.o calculate.o parse.o tree.o SPList.o SPListElement.o hashtable.o
 	$(CC) test.o common.o calculate.o parse.o tree.o SPList.o SPListElement.o hashtable.o -o test -lm
@@ -39,10 +39,10 @@ common.h:
 calculate.h: tree.h
 parse.h: tree.h
 tree.h:
-SPList.h:
+SPList.h: SPListElement.h
 SPListElement.h:
-hashtable.h:
+hashtable.h: SPListElement.h SPList.h
 
 clean:
 	cd SP; make clean
-	rm -f main.o common.o calculate.o parse.o tree.o test.o SPList.o SPListElement.o hashtable.o ex3 test
+	rm -f main.o common.o calculate.o parse.o tree.o test.o SPList.o SPListElement.o hashtable.o SPCalculator test

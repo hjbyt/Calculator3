@@ -2,13 +2,11 @@
  *  SPCalculator and must match the filename: SPCalculator.g4
  */
 grammar SPCalculator;
-
 /**
-* All generated files must reside in the package SP alongside our implementation
-* of the tree and the main function.
+* Our parse code will reside in the package SP alongside our implementation of a tree.
 */
 @header{
-package SP;
+	package SP;
 }
 
 @parser::members{
@@ -24,10 +22,10 @@ package SP;
 	}
 }
 
-//Valid statement is either a termination command || an arithmetical expression
-stat returns [SPTree tree] : e1=TERMINATION {$tree = new SPTree($e1.text);}
-			   | e2=exp {$tree = $e2.tree;}
-                           ; 
+//Valid statement is either a termination command || an arithmetical expression followed by a semicolon
+stat returns [SPTree tree] : e1=TERMINATION SEMICOLON {$tree = new SPTree($e1.text);}
+			   | e2=exp SEMICOLON {$tree = $e2.tree;}
+ ; 
 
 exp returns [SPTree tree] : 
 			  // Number
@@ -44,6 +42,7 @@ exp returns [SPTree tree] :
 
 // parser rules start with lowercase letters, lexer rules with uppercase
 TERMINATION: '<>';
+SEMICOLON: ';';
 
 // Numbers
 NUMBER: [0-9]+;
