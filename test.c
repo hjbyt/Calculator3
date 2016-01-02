@@ -133,16 +133,16 @@ void test_calculate()
     /* Note: it would be better to test calculate directly, without using parseLispExpression,
      *       but it is would be much more cumbersome. */
 
-    ASSERT(evaluateLispExpression("(1)") == 1);
-    ASSERT(evaluateLispExpression("(+(1))") == 1);
-    ASSERT(evaluateLispExpression("(-(1))") == -1);
-    ASSERT(evaluateLispExpression("(-(-(1)))") == 1);
-    ASSERT(evaluateLispExpression("(+(1)(2))") == 3);
-    ASSERT(evaluateLispExpression("(-(1)(2))") == -1);
-    ASSERT(evaluateLispExpression("(*(3)(2))") == 6);
-    ASSERT(evaluateLispExpression("(/(3)(2))") == 1.5);
+    ASSERT(fp_eq(evaluateLispExpression("(1)"), 1));
+    ASSERT(fp_eq(evaluateLispExpression("(+(1))"), 1));
+    ASSERT(fp_eq(evaluateLispExpression("(-(1))"), -1));
+    ASSERT(fp_eq(evaluateLispExpression("(-(-(1)))"), 1));
+    ASSERT(fp_eq(evaluateLispExpression("(+(1)(2))"), 3));
+    ASSERT(fp_eq(evaluateLispExpression("(-(1)(2))"), -1));
+    ASSERT(fp_eq(evaluateLispExpression("(*(3)(2))"), 6));
+    ASSERT(fp_eq(evaluateLispExpression("(/(3)(2))"), 1.5));
     ASSERT(isnan((float)evaluateLispExpression("(/(3)(0))")));
-    ASSERT(evaluateLispExpression("($(2)(3))") == 5);
+    ASSERT(fp_eq(evaluateLispExpression("($(2)(3))"), 5));
     ASSERT(isnan((float)evaluateLispExpression("($(3)(2))")));
 
     // the following expressions is equivalent to: "1 + --+2 * 3 $ 5 * (-6) - 4 / 2 $ 2 / (1 + 4)".
@@ -168,25 +168,25 @@ void test_hashtable()
     hashInsert(table, "e", 2.71828);
     ASSERT(4 == hashGetSize(table));
     ASSERT(!hashIsEmpty(table));
-    ASSERT(2.71828 == hashGetValue(table, "e"));
-    ASSERT(3.1415 == hashGetValue(table, "pi"));
-    ASSERT(5 == hashGetValue(table, "first"));
-    ASSERT(5.5 == hashGetValue(table, "second"));
+    ASSERT(fp_eq(2.71828, hashGetValue(table, "e")));
+    ASSERT(fp_eq(3.1415, hashGetValue(table, "pi")));
+    ASSERT(fp_eq(5, hashGetValue(table, "first")));
+    ASSERT(fp_eq(5.5, hashGetValue(table, "second")));
     ASSERT(hashContains(table, "first"));
     hashInsert(table, "first", 6);
     hashInsert(table, "second", 9);
-    ASSERT(4 == hashGetSize(table));
-    ASSERT(2.71828 == hashGetValue(table, "e"));
-    ASSERT(3.1415 == hashGetValue(table, "pi"));
-    ASSERT(6 == hashGetValue(table, "first"));
-    ASSERT(9 == hashGetValue(table, "second"));
+    ASSERT(fp_eq(4, hashGetSize(table)));
+    ASSERT(fp_eq(2.71828, hashGetValue(table, "e")));
+    ASSERT(fp_eq(3.1415, hashGetValue(table, "pi")));
+    ASSERT(fp_eq(6, hashGetValue(table, "first")));
+    ASSERT(fp_eq(9, hashGetValue(table, "second")));
     ASSERT(hashContains(table, "first"));
     hashDelete(table, "first");
     hashDelete(table, "second");
     ASSERT(2 == hashGetSize(table));
     ASSERT(!hashIsEmpty(table));
-    ASSERT(2.71828 == hashGetValue(table, "e"));
-    ASSERT(3.1415 == hashGetValue(table, "pi"));
+    ASSERT(fp_eq(2.71828, hashGetValue(table, "e")));
+    ASSERT(fp_eq(3.1415, hashGetValue(table, "pi")));
     ASSERT(!hashContains(table, "first"));
     destroyHashTable(table);
     
@@ -200,24 +200,24 @@ void test_hashtable()
     hashInsert(table2, "U4BQBV", 3);
     hashInsert(table2, "2V66VL", 4);
     hashInsert(table2, "PNTKJK", 5);
-    ASSERT(1 == hashGetValue(table2, "0UDBZE"));
-    ASSERT(2 == hashGetValue(table2, "YYHMYZ"));
-    ASSERT(3 == hashGetValue(table2, "U4BQBV"));
-    ASSERT(4 == hashGetValue(table2, "2V66VL"));
-    ASSERT(5 == hashGetValue(table2, "PNTKJK"));
+    ASSERT(fp_eq(1, hashGetValue(table2, "0UDBZE")));
+    ASSERT(fp_eq(2, hashGetValue(table2, "YYHMYZ")));
+    ASSERT(fp_eq(3, hashGetValue(table2, "U4BQBV")));
+    ASSERT(fp_eq(4, hashGetValue(table2, "2V66VL")));
+    ASSERT(fp_eq(5, hashGetValue(table2, "PNTKJK")));
     hashInsert(table2, "0UDBZE", 10);
     hashInsert(table2, "YYHMYZ", 20);
     ASSERT(hashContains(table2, "YYHMYZ"));
-    ASSERT(10 == hashGetValue(table2, "0UDBZE"));
-    ASSERT(20 == hashGetValue(table2, "YYHMYZ"));
-    ASSERT(3 == hashGetValue(table2, "U4BQBV"));
-    ASSERT(4 == hashGetValue(table2, "2V66VL"));
-    ASSERT(5 == hashGetValue(table2, "PNTKJK"));
+    ASSERT(fp_eq(10, hashGetValue(table2, "0UDBZE")));
+    ASSERT(fp_eq(20, hashGetValue(table2, "YYHMYZ")));
+    ASSERT(fp_eq(3, hashGetValue(table2, "U4BQBV")));
+    ASSERT(fp_eq(4, hashGetValue(table2, "2V66VL")));
+    ASSERT(fp_eq(5, hashGetValue(table2, "PNTKJK")));
     hashDelete(table2, "2V66VL");
     hashDelete(table2, "PNTKJK");
-    ASSERT(10 == hashGetValue(table2, "0UDBZE"));
-    ASSERT(20 == hashGetValue(table2, "YYHMYZ"));
-    ASSERT(3 == hashGetValue(table2, "U4BQBV"));
+    ASSERT(fp_eq(10, hashGetValue(table2, "0UDBZE")));
+    ASSERT(fp_eq(20, hashGetValue(table2, "YYHMYZ")));
+    ASSERT(fp_eq(3, hashGetValue(table2, "U4BQBV")));
     destroyHashTable(table2);
 }
 
