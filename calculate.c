@@ -10,6 +10,9 @@
 #include "calculate.h"
 #include "common.h"
 
+// TODO - Remove
+#include <stdio.h>
+
 /*
  * Constants
  */
@@ -70,9 +73,9 @@ double evaluateExpressionTree(Tree* tree)
                 panic();
         }    
     } else {
-        if (strcmp(operator_string, "min"))
+        if (0 == strcmp(operator_string, "min"))
             return evaluateMinExpression(tree);
-        else if (strcmp(operator_string, "max"))
+        else if (0 == strcmp(operator_string, "max"))
             return evaluateMaxExpression(tree);
         else
             panic();

@@ -53,7 +53,7 @@ expList returns [ ArrayList<SPTree> children ]
     {
     	$children = new ArrayList<SPTree>();
     } :
-    LEFT_PARENTHESIS e1=exp {$children.add(new SPTree($e1.text));} (COMMA e2=exp {$children.add(new SPTree($e2.text));})* RIGHT_PARENTHESIS
+    LEFT_PARENTHESIS e1=exp {$children.add($e1.tree);} (COMMA e2=exp {$children.add($e2.tree);})* RIGHT_PARENTHESIS
     ;
 		
 
