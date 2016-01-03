@@ -9,7 +9,6 @@
 #include "tree.h"
 #include "parse.h"
 #include "calculate.h"
-#include "hashtable.h"
 
 #define FAIL(msg)                                                       \
     do {                                                                \
@@ -221,6 +220,81 @@ void test_hashtable()
     destroyHashTable(table2);
 }
 
+void test_variable_file_parsing()
+{
+    HashTable table = createHashTable();
+
+    ASSERT(hashGetSize(table) == 0);
+
+    char line[100] = "aaa = 111";
+    parseVariableAssignmentLine(line, table);
+    ASSERT(hashGetSize(table) == 1);
+    ASSERT(fp_eq(111, hashGetValue(table, "aaa")));
+
+    strcpy(line, "aaa  \t  = \t 222");
+    parseVariableAssignmentLine(line, table);
+    ASSERT(hashGetSize(table) == 1);
+    ASSERT(fp_eq(222, hashGetValue(table, "aaa")));
+
+    strcpy(line, "bBb = 333\n");
+    parseVariableAssignmentLine(line, table);
+    ASSERT(hashGetSize(table) == 2);
+    ASSERT(fp_eq(333, hashGetValue(table, "bBb")));
+
+    strcpy(line, "aaa = -444");
+    parseVariableAssignmentLine(line, table);
+    ASSERT(hashGetSize(table) == 2);
+    ASSERT(fp_eq(-444, hashGetValue(table, "aaa")));
+
+    destroyHashTable(table);
+}
+
+void test_expression_to_string()
+{
+    char buffer[100];
+    Tree* tree;
+
+    tree = parseLispExpression("(+(5)(2))");
+    expressionToString(tree, buffer, sizeof(buffer));
+    ASSERT_EQ_STR(buffer, "(5+2)");
+    destroyTree(tree);
+
+    tree = parseLispExpression("(=(a)(3))");
+    expressionToString(tree, buffer, sizeof(buffer));
+    ASSERT_EQ_STR(buffer, "(a=3)");
+    destroyTree(tree);
+
+    tree = parseLispExpression("(+(a)(*(3)(2)))");
+    expressionToString(tree, buffer, sizeof(buffer));
+    ASSERT_EQ_STR(buffer, "(a+(3*2))");
+    destroyTree(tree);
+
+    tree = parseLispExpression("(=(b)(+(a)(1)))");
+    expressionToString(tree, buffer, sizeof(buffer));
+    ASSERT_EQ_STR(buffer, "(b=(a+1))");
+    destroyTree(tree);
+
+    tree = parseLispExpression("(<>)");
+    expressionToString(tree, buffer, sizeof(buffer));
+    ASSERT_EQ_STR(buffer, "(<>)");
+    destroyTree(tree);
+
+    tree = parseLispExpression("(-(1))");
+    expressionToString(tree, buffer, sizeof(buffer));
+    ASSERT_EQ_STR(buffer, "-1"); /* TODO: is this the right string to expect ? */
+    destroyTree(tree);
+
+    tree = parseLispExpression("(+(+(-(+(-(2))))))");
+    expressionToString(tree, buffer, sizeof(buffer));
+    ASSERT_EQ_STR(buffer, "++-+-2"); /* TODO: is this the right string to expect ? */
+    destroyTree(tree);
+
+    tree = parseLispExpression("(max(5)(32)(+(17)(5)))");
+    expressionToString(tree, buffer, sizeof(buffer));
+    ASSERT_EQ_STR(buffer, "max(5, 32, (17+5))"); /* TODO: is this the right string to expect ? */
+    destroyTree(tree);
+}
+
 int main()
 {
     printf("Running Tests...\n");
@@ -228,6 +302,8 @@ int main()
     test_parse();
     test_calculate();
     test_hashtable();
+    test_variable_file_parsing();
+    test_expression_to_string();
     printf("All Tests Passed.\n");
 
     return EXIT_SUCCESS;

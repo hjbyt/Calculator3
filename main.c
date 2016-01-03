@@ -12,19 +12,11 @@
 #include "common.h"
 
 /*
- * Constants
- */
-
-#define MAX_LINE_LENGTH 1024
-#define END_COMMAND "<>"
-
-/*
  * Function Declarations
  */
 
 bool interact();
 void getLine(char* buffer, unsigned int size);
-bool isEndCommand(Tree* tree);
 
 /*
  * Function Implementations
@@ -109,22 +101,4 @@ void getLine(char* buffer, unsigned int size)
     if (buffer[last_char_index] == '\n') {
         buffer[last_char_index] = '\0';
     }
-}
-
-/**
- * Check if the given expression tree represents the quit command.
- *
- * @param
- *      Tree* tree - Expression tree to examine.
- *
- * @preconditions
- *      tree != NULL
- *
- * @return
- *      true iff the Expression tree represents a quit command.
- */
-bool isEndCommand(Tree* tree)
-{
-    VERIFY(tree != NULL);
-    return (!hasChildren(tree) && strcmp(getValue(tree), END_COMMAND) == 0);
 }
