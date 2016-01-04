@@ -35,8 +35,11 @@ double evaluateMinusExpression(Tree* tree);
 double evaluateMultiplyExpression(Tree* tree);
 double evaluateDivideExpression(Tree* tree);
 double evaluateSumRangeExpression(Tree* tree);
+double evaluateAssignmentExpression(Tree* tree);
 double evaluateMinExpression(Tree* tree);
 double evaluateMaxExpression(Tree* tree);
+double evaluateAverageExpression(Tree* tree);
+double evaluateMedianExpression(Tree* tree);
 long long int  rangeSum(long long int  a, long long int  b);
 bool isNumber(const char* string);
 bool isDigit(char c);
@@ -50,13 +53,16 @@ bool isDigit(char c);
 
 /* TODO: doc */
 const OperationAndEvaluator OPERATIONS[] = {
-        {"+",   evaluatePlusExpression      },
-        {"-",   evaluateMinusExpression     },
-        {"*",   evaluateMultiplyExpression  },
-        {"/",   evaluateDivideExpression    },
-        {"$",   evaluateSumRangeExpression  },
-        {"min", evaluateMinExpression       },
-        {"max", evaluateMaxExpression       },
+        {"+",       evaluatePlusExpression      },
+        {"-",       evaluateMinusExpression     },
+        {"*",       evaluateMultiplyExpression  },
+        {"/",       evaluateDivideExpression    },
+        {"$",       evaluateSumRangeExpression  },
+        {"=",       evaluateAssignmentExpression},
+        {"min",     evaluateMinExpression       },
+        {"max",     evaluateMaxExpression       },
+        {"average", evaluateAverageExpression   },
+        {"median",  evaluateMedianExpression    },
 };
 
 /*
@@ -270,6 +276,16 @@ double evaluateSumRangeExpression(Tree* tree)
     }
 }
 
+/* TODO: doc */
+double evaluateAssignmentExpression(Tree* tree)
+{
+    VERIFY(tree != NULL);
+    VERIFY(childrenCount(tree) == 2);
+    /* TODO */
+    return NAN;
+}
+
+/* TODO: doc */
 double evaluateMinExpression(Tree* tree)
 {
     VERIFY(NULL != tree);
@@ -286,6 +302,7 @@ double evaluateMinExpression(Tree* tree)
     return minValue;
 }
 
+/* TODO: doc */
 double evaluateMaxExpression(Tree* tree)
 {
     VERIFY(NULL != tree);
@@ -300,6 +317,24 @@ double evaluateMaxExpression(Tree* tree)
     }
     
     return maxValue;
+}
+
+/* TODO: doc */
+double evaluateAverageExpression(Tree* tree)
+{
+    VERIFY(NULL != tree);
+    VERIFY(hasChildren(tree));
+    /* TODO */
+    return NAN;
+}
+
+/* TODO: doc */
+double evaluateMedianExpression(Tree* tree)
+{
+    VERIFY(NULL != tree);
+    VERIFY(hasChildren(tree));
+    /* TODO */
+    return NAN;
 }
 
 /**
