@@ -31,6 +31,8 @@
 
 Tree* createTreeFromLiteral(const char* string);
 double evaluateLispExpression(char* expression);
+bool check_single_expression_to_string(const char* lisp_expression,
+                                       const char* expected_string);
 bool fp_eq(double a, double b);
 
 /*
@@ -251,54 +253,15 @@ void test_variable_file_parsing()
 
 void test_expression_to_string()
 {
-    char buffer[100];
-    Tree* tree;
-
-    tree = parseLispExpression("(+(5)(2))");
-    expressionToString(tree, buffer, sizeof(buffer));
-    ASSERT_EQ_STR(buffer, "(5+2)");
-    destroyTree(tree);
-
-    tree = parseLispExpression("(=(a)(3))");
-    expressionToString(tree, buffer, sizeof(buffer));
-    ASSERT_EQ_STR(buffer, "(a=3)");
-    destroyTree(tree);
-
-    tree = parseLispExpression("(+(a)(*(3)(2)))");
-    expressionToString(tree, buffer, sizeof(buffer));
-    ASSERT_EQ_STR(buffer, "(a+(3*2))");
-    destroyTree(tree);
-
-    tree = parseLispExpression("(=(b)(+(a)(1)))");
-    expressionToString(tree, buffer, sizeof(buffer));
-    ASSERT_EQ_STR(buffer, "(b=(a+1))");
-    destroyTree(tree);
-
-    tree = parseLispExpression("(<>)");
-    expressionToString(tree, buffer, sizeof(buffer));
-    ASSERT_EQ_STR(buffer, "(<>)");
-    destroyTree(tree);
-
-    tree = parseLispExpression("(1)");
-    expressionToString(tree, buffer, sizeof(buffer));
-    ASSERT_EQ_STR(buffer, "(1)");
-    destroyTree(tree);
-
-    tree = parseLispExpression("(-(1))");
-    expressionToString(tree, buffer, sizeof(buffer));
-    ASSERT_EQ_STR(buffer, "(-1)");
-    destroyTree(tree);
-
-    tree = parseLispExpression("(+(+(-(+(-(2))))))");
-    expressionToString(tree, buffer, sizeof(buffer));
-    ASSERT_EQ_STR(buffer, "(+(+(-(+(-2)))))");
-    destroyTree(tree);
-
-    tree = parseLispExpression("(max(5)(32)(+(17)(5)))");
-    expressionToString(tree, buffer, sizeof(buffer));
-    ASSERT_EQ_STR(buffer, "(max(5,32,(17+5)))");
-    destroyTree(tree);
-
+    ASSERT(check_single_expression_to_string("(+(5)(2))", "(5+2)"));
+    ASSERT(check_single_expression_to_string("(=(a)(3))", "(a=3)"));
+    ASSERT(check_single_expression_to_string("(+(a)(*(3)(2)))", "(a+(3*2))"));
+    ASSERT(check_single_expression_to_string("(=(b)(+(a)(1)))", "(b=(a+1))"));
+    ASSERT(check_single_expression_to_string("(<>)", "(<>)"));
+    ASSERT(check_single_expression_to_string("(1)", "(1)"));
+    ASSERT(check_single_expression_to_string("(-(1))", "(-1)"));
+    ASSERT(check_single_expression_to_string("(+(+(-(+(-(2))))))", "(+(+(-(+(-2)))))"));
+    ASSERT(check_single_expression_to_string("(max(5)(32)(+(17)(5)))", "(max(5,32,(17+5)))"));
     /* TODO: add more test cases */
 }
 
@@ -335,6 +298,17 @@ double evaluateLispExpression(char* expression)
     double res = evaluateExpressionTree(expression_tree);
     destroyTree(expression_tree);
     return res;
+}
+
+bool check_single_expression_to_string(const char* lisp_expression,
+                                       const char* expected_string)
+{
+    char buffer[MAX_LINE_LENGTH + 1];
+    Tree* tree = parseLispExpression(lisp_expression);
+    expressionToString(tree, buffer, sizeof(buffer));
+    bool test_passed = (strcmp(buffer, expected_string) == 0);
+    destroyTree(tree);
+    return test_passed;
 }
 
 /* Check floating point equality up to small error */
