@@ -69,12 +69,6 @@ void expressionToString(Tree* tree, char* buffer, unsigned int buffer_size)
     VERIFY(tree != NULL);
     VERIFY(buffer != NULL);
 
-    if (isEndCommand(tree)) {
-        VERIFY(buffer_size > 4);
-        strcpy(buffer, "(<>)");
-        return;
-    }
-
     /* TODO: explain the memset */
     memset(buffer, 0, buffer_size);
     expressionToString_(tree, &buffer, buffer + buffer_size);
@@ -264,8 +258,16 @@ void terminalExpressionToString(Tree* tree, char** buffer_pointer, char* buffer_
     VERIFY(buffer_pointer != NULL);
     VERIFY(childrenCount(tree) == 0);
 
+    if (isRoot(tree)) {
+        appendToBuffer("(", buffer_pointer, buffer_end);
+    }
+
     char* terminal = getValue(tree);
     appendToBuffer(terminal, buffer_pointer, buffer_end);
+
+    if (isRoot(tree)) {
+        appendToBuffer(")", buffer_pointer, buffer_end);
+    }
 }
 
 /* TODO: doc */
@@ -275,10 +277,11 @@ void unaryOperatorExpressionToString(Tree* tree, char** buffer_pointer, char* bu
     VERIFY(buffer_pointer != NULL);
     VERIFY(childrenCount(tree) == 1);
 
-    /* TODO: wrap unary expression with () ?*/
+    appendToBuffer("(", buffer_pointer, buffer_end);
     char* operator = getValue(tree);
     appendToBuffer(operator, buffer_pointer, buffer_end);
     expressionToString_(firstChild(tree), buffer_pointer, buffer_end);
+    appendToBuffer(")", buffer_pointer, buffer_end);
 }
 
 /* TODO: doc */
@@ -303,6 +306,8 @@ void functionExpressionToString(Tree* tree, char** buffer_pointer, char* buffer_
     VERIFY(buffer_pointer != NULL);
     VERIFY(childrenCount(tree) >= 1);
 
+    appendToBuffer("(", buffer_pointer, buffer_end);
+
     char* function = getValue(tree);
     appendToBuffer(function, buffer_pointer, buffer_end);
 
@@ -312,11 +317,11 @@ void functionExpressionToString(Tree* tree, char** buffer_pointer, char* buffer_
     expressionToString_(child, buffer_pointer, buffer_end);
     for (child = nextBrother(child); child != NULL; child = nextBrother(child))
     {
-        appendToBuffer(", ", buffer_pointer, buffer_end);
+        appendToBuffer(",", buffer_pointer, buffer_end);
         expressionToString_(child, buffer_pointer, buffer_end);
     }
 
-    appendToBuffer(")", buffer_pointer, buffer_end);
+    appendToBuffer("))", buffer_pointer, buffer_end);
 }
 
 /* TODO: doc */

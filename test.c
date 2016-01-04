@@ -279,20 +279,27 @@ void test_expression_to_string()
     ASSERT_EQ_STR(buffer, "(<>)");
     destroyTree(tree);
 
+    tree = parseLispExpression("(1)");
+    expressionToString(tree, buffer, sizeof(buffer));
+    ASSERT_EQ_STR(buffer, "(1)");
+    destroyTree(tree);
+
     tree = parseLispExpression("(-(1))");
     expressionToString(tree, buffer, sizeof(buffer));
-    ASSERT_EQ_STR(buffer, "-1"); /* TODO: is this the right string to expect ? */
+    ASSERT_EQ_STR(buffer, "(-1)");
     destroyTree(tree);
 
     tree = parseLispExpression("(+(+(-(+(-(2))))))");
     expressionToString(tree, buffer, sizeof(buffer));
-    ASSERT_EQ_STR(buffer, "++-+-2"); /* TODO: is this the right string to expect ? */
+    ASSERT_EQ_STR(buffer, "(+(+(-(+(-2)))))");
     destroyTree(tree);
 
     tree = parseLispExpression("(max(5)(32)(+(17)(5)))");
     expressionToString(tree, buffer, sizeof(buffer));
-    ASSERT_EQ_STR(buffer, "max(5, 32, (17+5))"); /* TODO: is this the right string to expect ? */
+    ASSERT_EQ_STR(buffer, "(max(5,32,(17+5)))");
     destroyTree(tree);
+
+    /* TODO: add more test cases */
 }
 
 int main()
