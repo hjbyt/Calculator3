@@ -19,7 +19,7 @@ const char* DELIMITERS = " \t";
 
 const char* UNARY_OR_BINARY_OPERATORS[] = {"+", "-"};
 const char* BINARY_OPERATORS[] = {"*", "/", "$", "="};
-const char* FUNCTION_OPERATIONS[] = {"max", "min"};
+const char* FUNCTION_OPERATIONS[] = {"max", "min", "average", "median"};
 
 /*
  * Internal Function Declarations
