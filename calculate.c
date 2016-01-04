@@ -42,6 +42,7 @@ double evaluateMedianExpression(Tree* tree);
 long long int  rangeSum(long long int  a, long long int  b);
 bool isNumber(const char* string);
 bool isDigit(char c);
+int compareDouble(const void* a, const void* b);
 
 /*
  * Constants
@@ -289,16 +290,17 @@ double evaluateMinExpression(Tree* tree)
 {
     VERIFY(NULL != tree);
     VERIFY(hasChildren(tree));
-    Tree* child = firstChild(tree);
+
     double minValue = NAN;
-    
-    while (child) {
+    for (Tree* child = firstChild(tree);
+         child != NULL;
+         child = nextBrother(child))
+    {
         double current = evaluateExpressionTree(child);
         if (isnan((float)current)) {
             return NAN;
         }
         minValue = fmin(minValue, current);
-        child = nextBrother(child);
     }
     
     return minValue;
@@ -309,16 +311,17 @@ double evaluateMaxExpression(Tree* tree)
 {
     VERIFY(NULL != tree);
     VERIFY(hasChildren(tree));
-    Tree* child = firstChild(tree);
+
     double maxValue = NAN;
-    
-    while (child) {
+    for (Tree* child = firstChild(tree);
+         child != NULL;
+         child = nextBrother(child))
+    {
         double current = evaluateExpressionTree(child);
         if (isnan((float)current)) {
             return NAN;
         }
         maxValue = fmax(maxValue, current);
-        child = nextBrother(child);
     }
     
     return maxValue;
@@ -335,7 +338,11 @@ double evaluateAverageExpression(Tree* tree)
          child != NULL;
          child = nextBrother(child))
     {
-        sum += evaluateExpressionTree(child);
+        double current = evaluateExpressionTree(child);
+        if (isnan((float)current)) {
+            return NAN;
+        }
+        sum += current;
     }
 
     return sum / (double)childrenCount(tree);
@@ -346,8 +353,39 @@ double evaluateMedianExpression(Tree* tree)
 {
     VERIFY(NULL != tree);
     VERIFY(hasChildren(tree));
-    /* TODO */
-    return NAN;
+
+    unsigned int operands_count = childrenCount(tree);
+    double* operands = malloc(operands_count * sizeof(double));
+    VERIFY(operands != NULL);
+
+    int i = 0;
+    for (Tree* child = firstChild(tree);
+         child != NULL;
+         child = nextBrother(child))
+    {
+        double current = evaluateExpressionTree(child);
+        if (isnan((float)operands[i])) {
+            return NAN;
+        }
+        operands[i] = current;
+        i += 1;
+    }
+
+    /* Note: using quickselect would be better,
+     * but because it's promised that the number of operands is not greater than 10,
+     * it doesn't really matter. */
+    qsort(operands, operands_count, sizeof(*operands), compareDouble);
+
+    double result;
+    if (operands_count % 2 == 1) {
+        result = operands[(operands_count - 1)/2];
+    } else {
+        result = (operands[operands_count/2] + operands[operands_count/2 - 1]) / 2;
+    }
+
+    free(operands);
+
+    return result;
 }
 
 /**
@@ -413,4 +451,18 @@ bool isNumber(const char* string)
 bool isDigit(char c)
 {
     return (c >= '0' && c <= '9');
+}
+
+/* TODO: doc */
+int compareDouble(const void* a, const void* b)
+{
+    double a_ = *(double*)a;
+    double b_ = *(double*)b;
+    if (a_ < b_) {
+        return -1;
+    } else if (a_ == b_) {
+        return 0;
+    } else {
+        return 1;
+    }
 }

@@ -165,6 +165,11 @@ void test_calculate()
     ASSERT(isnan((float)(evaluateLispExpression("(min(3)($(5)(2))(4))"))));
     ASSERT(fp_eq(evaluateLispExpression("(average(3)(-(2))(4))"), 1.6666666666666667));
     ASSERT(isnan((float)(evaluateLispExpression("(average(3)(/(1)(0))(4))"))));
+    ASSERT(fp_eq(evaluateLispExpression("(median(3)(-(2))(4))"), 3));
+    ASSERT(fp_eq(evaluateLispExpression("(median(3)(-(2))(5)(4))"), 3.5));
+    ASSERT(isnan((float)(evaluateLispExpression("(median(3)(/(1)(0))(4))"))));
+    ASSERT(fp_eq(evaluateLispExpression("(median(8)(7)(4)(5)(9)(1)(2)(3)(6))"), 5));
+    ASSERT(fp_eq(evaluateLispExpression("(median(8)(7)(4)(5)(9)(1)(2)(3)(6)(0))"), 4.5));
 }
 
 void test_hashtable() 
