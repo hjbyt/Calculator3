@@ -158,6 +158,13 @@ void test_calculate()
     // the following expressions is equivalent to: "1 + --+2 * 3 $ 5 * (-6) - 4 / -2 $ 2 / (1 + 4)".
     // (checks proper propagation of NAN result from division by zero)
     ASSERT(isnan((float)evaluateLispExpression("(-(+(1)(*(*(-(-(+(2))))($(3)(5)))(-(6))))(/(/(4)($(2)(1)))(+(1)(4))))")));
+
+    ASSERT(fp_eq(evaluateLispExpression("(max(3)(-(2))(4))"), 4));
+    ASSERT(fp_eq(evaluateLispExpression("(min(3)(-(2))(4))"), -2));
+    ASSERT(isnan((float)(evaluateLispExpression("(max(3)(/(1)(0))(4))"))));
+    ASSERT(isnan((float)(evaluateLispExpression("(min(3)($(5)(2))(4))"))));
+    ASSERT(fp_eq(evaluateLispExpression("(average(3)(-(2))(4))"), 1.6666666666666667));
+    ASSERT(isnan((float)(evaluateLispExpression("(average(3)(/(1)(0))(4))"))));
 }
 
 void test_hashtable() 

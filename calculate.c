@@ -5,7 +5,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include <float.h>
 #include <math.h>
 #include "calculate.h"
 #include "common.h"
@@ -291,10 +290,13 @@ double evaluateMinExpression(Tree* tree)
     VERIFY(NULL != tree);
     VERIFY(hasChildren(tree));
     Tree* child = firstChild(tree);
-    double minValue = DBL_MAX;
+    double minValue = NAN;
     
     while (child) {
         double current = evaluateExpressionTree(child);
+        if (isnan((float)current)) {
+            return NAN;
+        }
         minValue = fmin(minValue, current);
         child = nextBrother(child);
     }
@@ -308,10 +310,13 @@ double evaluateMaxExpression(Tree* tree)
     VERIFY(NULL != tree);
     VERIFY(hasChildren(tree));
     Tree* child = firstChild(tree);
-    double maxValue = -DBL_MAX;
+    double maxValue = NAN;
     
     while (child) {
         double current = evaluateExpressionTree(child);
+        if (isnan((float)current)) {
+            return NAN;
+        }
         maxValue = fmax(maxValue, current);
         child = nextBrother(child);
     }
