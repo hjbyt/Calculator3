@@ -32,9 +32,6 @@ void unaryOperatorExpressionToString(Tree* tree, char** buffer_pointer, char* bu
 void binaryOperatorExpressionToString(Tree* tree, char** buffer_pointer, char* buffer_end);
 void functionExpressionToString(Tree* tree, char** buffer_pointer, char* buffer_end);
 
-bool isName(char* string);
-bool isLetter(char c);
-
 /*
  * Module Functions
  */
@@ -318,23 +315,4 @@ void functionExpressionToString(Tree* tree, char** buffer_pointer, char* buffer_
     }
 
     appendToBuffer("))", buffer_pointer, buffer_end);
-}
-
-/* TODO: doc */
-bool isName(char* string)
-{
-    VERIFY(string != NULL);
-    for (char *c = string; *c != '\0'; c++)
-    {
-        if (!isLetter(*c)) {
-            return false;
-        }
-    }
-    return true;
-}
-
-/* TODO: doc */
-bool isLetter(char c)
-{
-    return (c >= 'A') && (c <= 'z');
 }

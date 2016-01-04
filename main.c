@@ -167,8 +167,7 @@ void interact(HashTable variables, FILE* output_file)
             break;
         }
 
-        /* TODO: use variables in evaluateExpressionTree()*/
-        double result = evaluateExpressionTree(parse_tree);
+        double result = evaluateExpressionTree(parse_tree, variables);
         if (isnan((float)result)) {
             fprintf(output_file, "Invalid Result\n");
         } else {

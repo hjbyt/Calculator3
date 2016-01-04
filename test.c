@@ -31,6 +31,7 @@
 
 Tree* createTreeFromLiteral(const char* string);
 double evaluateLispExpression(char* expression);
+double evaluateLispExpressionWithVars(char* expression, HashTable variables);
 bool check_single_expression_to_string(const char* lisp_expression,
                                        const char* expected_string);
 bool fp_eq(double a, double b);
@@ -131,9 +132,6 @@ void test_parse()
 
 void test_calculate()
 {
-    /* Note: it would be better to test calculate directly, without using parseLispExpression,
-     *       but it is would be much more cumbersome. */
-
     ASSERT(fp_eq(evaluateLispExpression("(1)"), 1));
     ASSERT(fp_eq(evaluateLispExpression("(+(1))"), 1));
     ASSERT(fp_eq(evaluateLispExpression("(-(1))"), -1));
@@ -170,6 +168,34 @@ void test_calculate()
     ASSERT(isnan((float)(evaluateLispExpression("(median(3)(/(1)(0))(4))"))));
     ASSERT(fp_eq(evaluateLispExpression("(median(8)(7)(4)(5)(9)(1)(2)(3)(6))"), 5));
     ASSERT(fp_eq(evaluateLispExpression("(median(8)(7)(4)(5)(9)(1)(2)(3)(6)(0))"), 4.5));
+
+    HashTable variables = createHashTable();
+
+    hashInsert(variables, "a", 3);
+    hashInsert(variables, "b", -7);
+
+    ASSERT(fp_eq(evaluateLispExpressionWithVars("(*(a)(2))", variables), 6));
+    ASSERT(fp_eq(evaluateLispExpressionWithVars("(+(a)(b))", variables), -4));
+    ASSERT(isnan((float)evaluateLispExpressionWithVars("(+(4)(c))", variables)));
+    ASSERT(fp_eq(evaluateLispExpressionWithVars("(=(c)(8))", variables), 8));
+    ASSERT(fp_eq(evaluateLispExpressionWithVars("(+(4)(c))", variables), 12));
+    ASSERT(fp_eq(evaluateLispExpressionWithVars("(=(a)(/(1)(2)))", variables), 0.5));
+
+    /* TODO: should this use case really be supported ??? */
+    ASSERT(fp_eq(evaluateLispExpressionWithVars("(+(=(d)(4))(c))", variables), 12));
+    ASSERT(fp_eq(evaluateLispExpressionWithVars("(+(4)(d))", variables), 8));
+
+    ASSERT(isnan((float)evaluateLispExpressionWithVars("(=(c)(/(5)(0)))", variables)));
+    ASSERT(isnan((float)evaluateLispExpressionWithVars("(=(e)(/(5)(0)))", variables)));
+
+    ASSERT(fp_eq(evaluateLispExpressionWithVars("(a)", variables), 0.5));
+    ASSERT(fp_eq(evaluateLispExpressionWithVars("(b)", variables), -7));
+    ASSERT(fp_eq(evaluateLispExpressionWithVars("(c)", variables), 8));
+    ASSERT(fp_eq(evaluateLispExpressionWithVars("(d)", variables), 4));
+    ASSERT(!hashContains(variables, "e"));
+
+    destroyHashTable(variables);
+
 }
 
 void test_hashtable() 
@@ -309,8 +335,16 @@ Tree* createTreeFromLiteral(const char* string)
 
 double evaluateLispExpression(char* expression)
 {
+    HashTable variables = createHashTable();
+    double res = evaluateLispExpressionWithVars(expression, variables);
+    destroyHashTable(variables);
+    return res;
+}
+
+double evaluateLispExpressionWithVars(char* expression, HashTable variables)
+{
     Tree* expression_tree = parseLispExpression(expression);
-    double res = evaluateExpressionTree(expression_tree);
+    double res = evaluateExpressionTree(expression_tree, variables);
     destroyTree(expression_tree);
     return res;
 }

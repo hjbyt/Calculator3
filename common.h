@@ -44,4 +44,36 @@ void panic() __attribute__ ((noreturn));
 /* TODO: doc */
 bool isStringInArray(const char* string, const char** string_array, unsigned int array_length);
 
+/**
+ * Check if the given string is a number made of digits only.
+ * Note: this function returns false for strings such as: "-123", "+123", "1.0".
+ *
+ * @param
+ *      const char* string - String to check.
+ *
+ * @preconditions
+ *      string != NULL
+ *
+ * @return
+ *      true iff string is a number made of digits only.
+ */
+bool isNumber(const char* string);
+
+/**
+ * Check if the given character is a digit.
+ *
+ * @param
+ *      char c - Character to check.
+ *
+ * @return
+ *      true iff c is a digit.
+ */
+bool isDigit(char c);
+
+/* TODO: doc */
+bool isName(char* string);
+
+/* TODO: doc */
+bool isLetter(char c);
+
 #endif /* COMMON_H_ */

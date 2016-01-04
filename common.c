@@ -24,3 +24,44 @@ bool isStringInArray(const char* string, const char** string_array, unsigned int
     }
     return false;
 }
+
+bool isNumber(const char* string)
+{
+    VERIFY(string != NULL);
+    const char* c = string;
+
+    if (*c == '\0') {
+        return false;
+    }
+
+    do {
+        if (!isDigit(*c)) {
+            return false;
+        }
+        c++;
+    } while (*c != '\0');
+
+    return true;
+}
+
+bool isDigit(char c)
+{
+    return (c >= '0' && c <= '9');
+}
+
+bool isName(char* string)
+{
+    VERIFY(string != NULL);
+    for (char *c = string; *c != '\0'; c++)
+    {
+        if (!isLetter(*c)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool isLetter(char c)
+{
+    return (c >= 'A') && (c <= 'z');
+}
