@@ -11,23 +11,24 @@
 #include "common.h"
 
 /*
- * Constants
+ * Types
  */
 
 /* TODO: doc */
-#define EQUALITY_THRESHOLD 0.000001
+typedef double (*EvaluatorFunc)(Tree*);
 
-/* Operations */
-#define PLUS_OPERATION      '+'
-#define MINUS_OPERATION     '-'
-#define MULTIPLY_OPERATION  '*'
-#define DIVIDE_OPERATION    '/'
-#define SUM_RANGE_OPERATION '$'
+/* TODO: doc */
+typedef struct OperationAndEvaluator_
+{
+    char* operation_string;
+    EvaluatorFunc evaluator;
+} OperationAndEvaluator;
 
 /*
  * Internal Function Declarations
  */
 
+EvaluatorFunc getEvaluator(char* operation_string);
 double evaluateNumberExpression(Tree* tree);
 double evaluatePlusExpression(Tree* tree);
 double evaluateMinusExpression(Tree* tree);
@@ -41,6 +42,24 @@ bool isNumber(const char* string);
 bool isDigit(char c);
 
 /*
+ * Constants
+ */
+
+/* TODO: doc */
+#define EQUALITY_THRESHOLD 0.000001
+
+/* TODO: doc */
+const OperationAndEvaluator OPERATIONS[] = {
+        {"+",   evaluatePlusExpression      },
+        {"-",   evaluateMinusExpression     },
+        {"*",   evaluateMultiplyExpression  },
+        {"/",   evaluateDivideExpression    },
+        {"$",   evaluateSumRangeExpression  },
+        {"min", evaluateMinExpression       },
+        {"max", evaluateMaxExpression       },
+};
+
+/*
  * Module Functions
  */
 
@@ -52,39 +71,37 @@ double evaluateExpressionTree(Tree* tree)
         return evaluateNumberExpression(tree);
     }
 
-    char* operator_string = getValue(tree);
-    
-    if (strlen(operator_string) == 1) {
-        char operator = *operator_string;
+    char* operation_string = getValue(tree);
+    EvaluatorFunc evaluator = getEvaluator(operation_string);
+    VERIFY(evaluator != NULL);
 
-        switch (operator)
-        {
-            case PLUS_OPERATION:
-                return evaluatePlusExpression(tree);
-            case MINUS_OPERATION:
-                return evaluateMinusExpression(tree);
-            case MULTIPLY_OPERATION:
-                return evaluateMultiplyExpression(tree);
-            case DIVIDE_OPERATION:
-                return evaluateDivideExpression(tree);
-            case SUM_RANGE_OPERATION:
-                return evaluateSumRangeExpression(tree);
-            default:
-                panic();
-        }    
-    } else {
-        if (strcmp(operator_string, "min"))
-            return evaluateMinExpression(tree);
-        else if (strcmp(operator_string, "max"))
-            return evaluateMaxExpression(tree);
-        else
-            panic();
-    }
+    /* Evaluate operation */
+    return evaluator(tree);
 }
 
 /*
  * Internal Functions
  */
+
+/* TODO: doc */
+EvaluatorFunc getEvaluator(char* operation_string)
+{
+    OperationAndEvaluator operation_pair;
+    bool found = false;
+    for (int i = 0; i < ARRAY_LENGTH(OPERATIONS); ++i)
+    {
+        operation_pair = OPERATIONS[i];
+        if (strcmp(operation_string, operation_pair.operation_string) == 0) {
+            found = true;
+            break;
+        }
+    }
+    if (found) {
+        return operation_pair.evaluator;
+    } else {
+        return NULL;
+    }
+}
 
 /**
  * Evaluate a number expression sub-tree (tree leaf).
