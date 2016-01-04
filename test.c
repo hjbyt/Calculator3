@@ -144,7 +144,10 @@ void test_calculate()
     ASSERT(fp_eq(evaluateLispExpression("(/(3)(2))"), 1.5));
     ASSERT(isnan((float)evaluateLispExpression("(/(3)(0))")));
     ASSERT(fp_eq(evaluateLispExpression("($(2)(3))"), 5));
+    ASSERT(fp_eq(evaluateLispExpression("($(-(5))(10))"), 40));
     ASSERT(isnan((float)evaluateLispExpression("($(3)(2))")));
+    ASSERT(isnan((float)evaluateLispExpression("($(2)(/(11)(5)))")));
+    ASSERT(isnan((float)evaluateLispExpression("($(/(11)(5))(2))")));
 
     // the following expressions is equivalent to: "1 + --+2 * 3 $ 5 * (-6) - 4 / 2 $ 2 / (1 + 4)".
     // (checks proper evaluation of complex expression)

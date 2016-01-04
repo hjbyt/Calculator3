@@ -14,6 +14,9 @@
  * Constants
  */
 
+/* TODO: doc */
+#define EQUALITY_THRESHOLD 0.000001
+
 /* Operations */
 #define PLUS_OPERATION      '+'
 #define MINUS_OPERATION     '-'
@@ -33,7 +36,7 @@ double evaluateDivideExpression(Tree* tree);
 double evaluateSumRangeExpression(Tree* tree);
 double evaluateMinExpression(Tree* tree);
 double evaluateMaxExpression(Tree* tree);
-long rangeSum(long a, long b);
+long long int  rangeSum(long long int  a, long long int  b);
 bool isNumber(const char* string);
 bool isDigit(char c);
 
@@ -234,12 +237,19 @@ double evaluateSumRangeExpression(Tree* tree)
 {
     VERIFY(tree != NULL);
     VERIFY(childrenCount(tree) == 2);
-    long a = (long)evaluateExpressionTree(firstChild(tree));
-    long b = (long)evaluateExpressionTree(lastChild(tree));
-    if (a > b) {
+
+    double a_ = evaluateExpressionTree(firstChild(tree));
+    double b_ = evaluateExpressionTree(lastChild(tree));
+
+    long long int a = llround(a_);
+    long long int b = llround(b_);
+
+    if (   fabs(a_ - (double)a) > EQUALITY_THRESHOLD
+        || fabs(b_ - (double)b) > EQUALITY_THRESHOLD
+        || a > b) {
         return NAN;
     } else {
-        return rangeSum(a, b);
+        return (double)rangeSum(a, b);
     }
 }
 
@@ -288,7 +298,7 @@ double evaluateMaxExpression(Tree* tree)
  * @return
  *      Calculation result.
  */
-long rangeSum(long a, long b)
+long long int rangeSum(long long int  a, long long int  b)
 {
     VERIFY(a <= b);
     return (a + b) * (b - a + 1) / 2;
