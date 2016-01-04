@@ -324,8 +324,16 @@ double evaluateAverageExpression(Tree* tree)
 {
     VERIFY(NULL != tree);
     VERIFY(hasChildren(tree));
-    /* TODO */
-    return NAN;
+
+    double sum = 0;
+    for (Tree* child = firstChild(tree);
+         child != NULL;
+         child = nextBrother(child))
+    {
+        sum += evaluateExpressionTree(child);
+    }
+
+    return sum / (double)childrenCount(tree);
 }
 
 /* TODO: doc */
