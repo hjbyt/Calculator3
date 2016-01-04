@@ -17,9 +17,7 @@
 const char* DELIMITERS = " \t";
 #define END_COMMAND "<>"
 
-const char* UNARY_OR_BINARY_OPERATORS[] = {"+", "-"};
-const char* BINARY_OPERATORS[] = {"*", "/", "$", "="};
-const char* FUNCTION_OPERATIONS[] = {"max", "min", "average", "median"};
+const char* OPERATORS[] = {"+", "-", "*", "/", "$", "="};
 
 /*
  * Internal Function Declarations
@@ -215,24 +213,22 @@ void expressionToString_(Tree* tree, char** buffer_pointer, char* buffer_end)
     unsigned int children_count = childrenCount(tree);
     if (children_count == 0) {
         terminalExpressionToString(tree, buffer_pointer, buffer_end);
-    } else {
-        char* operation = getValue(tree);
-        if (IS_STRING_IN_ARRAY(operation, UNARY_OR_BINARY_OPERATORS)) {
-            if (children_count == 1) {
-                unaryOperatorExpressionToString(tree, buffer_pointer, buffer_end);
-            } else if (children_count == 2) {
-                binaryOperatorExpressionToString(tree, buffer_pointer, buffer_end);
-            } else {
-                panic();
-            }
-        } else if (IS_STRING_IN_ARRAY(operation, BINARY_OPERATORS)) {
-            VERIFY(children_count == 2);
+        return;
+    }
+
+    char* operation = getValue(tree);
+
+    if (IS_STRING_IN_ARRAY(operation, OPERATORS)) {
+        if (children_count == 1) {
+            unaryOperatorExpressionToString(tree, buffer_pointer, buffer_end);
+        } else if (children_count == 2) {
             binaryOperatorExpressionToString(tree, buffer_pointer, buffer_end);
-        } else if (IS_STRING_IN_ARRAY(operation, FUNCTION_OPERATIONS)) {
-            functionExpressionToString(tree, buffer_pointer, buffer_end);
         } else {
             panic();
         }
+    } else {
+        /* Assume it's a function */
+        functionExpressionToString(tree, buffer_pointer, buffer_end);
     }
 }
 
