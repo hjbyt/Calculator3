@@ -1,16 +1,16 @@
-line 1:4 no viable alternative at input '<EOF>'
-Invalid Expression : 1/5-
-line 1:6 no viable alternative at input '<EOF>'
-Invalid Expression : (5+2)*
+line 1:4 no viable alternative at input ';'
+Invalid Expression : 1/5-;
+line 1:6 no viable alternative at input ';'
+Invalid Expression : (5+2)*;
 line 1:5 no viable alternative at input ')'
-Invalid Expression : (3+5*)
-line 1:8 no viable alternative at input '<EOF>'
-Invalid Expression : 123+556/
-line 1:15 no viable alternative at input '<EOF>'
-Invalid Expression : 123457+190/104/
-line 1:4 no viable alternative at input '<EOF>'
-Invalid Expression : 1/5-
-Invalid Expression : 5+3*(5/(7/2)
-Invalid Expression : 3*(7/2)$(6-6*(1)
+Invalid Expression : (3+5*);
+line 1:8 no viable alternative at input ';'
+Invalid Expression : 123+556/;
+line 1:15 no viable alternative at input ';'
+Invalid Expression : 123457+190/104/;
+line 1:4 no viable alternative at input ';'
+Invalid Expression : 1/5-;
+Invalid Expression : 5+3*(5/(7/2);
+Invalid Expression : 3*(7/2)$(6-6*(1);
 line 1:9 no viable alternative at input ')'
-Invalid Expression : (6/0)$(7+)
+Invalid Expression : (6/0)$(7+);

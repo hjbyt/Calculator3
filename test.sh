@@ -1,4 +1,4 @@
-for i in {1..5}
+for i in {1..7}
 do 
     mkdir -p out/$i
     java SP.SPCalculatorMain -i tests/$i/input$i.in -e out/$i/test$i.err | ./SPCalculator > out/$i/test$i.out

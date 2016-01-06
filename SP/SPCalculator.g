@@ -39,7 +39,7 @@ exp returns [SPTree tree] :
 			  // Sub-expression
 			  | LEFT_PARENTHESIS e1=exp RIGHT_PARENTHESIS {$tree = $e1.tree;}
 			  // Min\Max operations
-			  | c=(MIN|MAX) e=expList {$tree = new SPTree($c.text); AddAll($tree, $e.children); }
+			  | c=(MIN|MAX|MEDIAN|AVEREGE) e=expList {$tree = new SPTree($c.text); AddAll($tree, $e.children); }
 			  // Unary operation
 			  | c=(PLUS|MINUS) e1=exp               {$tree = new SPTree($c.text); $tree.insertChild($e1.tree);}
 			  // Binary operation
@@ -76,6 +76,8 @@ DIVIDE: '/';
 SUM_RANGE: '$';
 MIN: 'min';
 MAX: 'max';
+MEDIAN: 'median';
+AVEREGE: 'average';
 COMMA: ',';
 
 // Ignore whitespace
