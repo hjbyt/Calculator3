@@ -36,7 +36,7 @@ hashtable.o: hashtable.h hashtable.c
 	$(CC) -c hashtable.c
 
 common.h:
-calculate.h: tree.h
+calculate.h: tree.h hashtable.h
 parse.h: tree.h hashtable.h
 tree.h:
 SPList.h: SPListElement.h

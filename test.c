@@ -31,6 +31,9 @@
 
 Tree* createTreeFromLiteral(const char* string);
 double evaluateLispExpression(char* expression);
+double evaluateLispExpressionWithVars(char* expression, HashTable variables);
+bool check_single_expression_to_string(const char* lisp_expression,
+                                       const char* expected_string);
 bool fp_eq(double a, double b);
 
 /*
@@ -129,9 +132,6 @@ void test_parse()
 
 void test_calculate()
 {
-    /* Note: it would be better to test calculate directly, without using parseLispExpression,
-     *       but it is would be much more cumbersome. */
-
     ASSERT(fp_eq(evaluateLispExpression("(1)"), 1));
     ASSERT(fp_eq(evaluateLispExpression("(+(1))"), 1));
     ASSERT(fp_eq(evaluateLispExpression("(-(1))"), -1));
@@ -142,7 +142,10 @@ void test_calculate()
     ASSERT(fp_eq(evaluateLispExpression("(/(3)(2))"), 1.5));
     ASSERT(isnan((float)evaluateLispExpression("(/(3)(0))")));
     ASSERT(fp_eq(evaluateLispExpression("($(2)(3))"), 5));
+    ASSERT(fp_eq(evaluateLispExpression("($(-(5))(10))"), 40));
     ASSERT(isnan((float)evaluateLispExpression("($(3)(2))")));
+    ASSERT(isnan((float)evaluateLispExpression("($(2)(/(11)(5)))")));
+    ASSERT(isnan((float)evaluateLispExpression("($(/(11)(5))(2))")));
 
     // the following expressions is equivalent to: "1 + --+2 * 3 $ 5 * (-6) - 4 / 2 $ 2 / (1 + 4)".
     // (checks proper evaluation of complex expression)
@@ -153,6 +156,46 @@ void test_calculate()
     // the following expressions is equivalent to: "1 + --+2 * 3 $ 5 * (-6) - 4 / -2 $ 2 / (1 + 4)".
     // (checks proper propagation of NAN result from division by zero)
     ASSERT(isnan((float)evaluateLispExpression("(-(+(1)(*(*(-(-(+(2))))($(3)(5)))(-(6))))(/(/(4)($(2)(1)))(+(1)(4))))")));
+
+    ASSERT(fp_eq(evaluateLispExpression("(max(3)(-(2))(4))"), 4));
+    ASSERT(fp_eq(evaluateLispExpression("(min(3)(-(2))(4))"), -2));
+    ASSERT(isnan((float)(evaluateLispExpression("(max(3)(/(1)(0))(4))"))));
+    ASSERT(isnan((float)(evaluateLispExpression("(min(3)($(5)(2))(4))"))));
+    ASSERT(fp_eq(evaluateLispExpression("(average(3)(-(2))(4))"), 1.6666666666666667));
+    ASSERT(isnan((float)(evaluateLispExpression("(average(3)(/(1)(0))(4))"))));
+    ASSERT(fp_eq(evaluateLispExpression("(median(3)(-(2))(4))"), 3));
+    ASSERT(fp_eq(evaluateLispExpression("(median(3)(-(2))(5)(4))"), 3.5));
+    ASSERT(isnan((float)(evaluateLispExpression("(median(3)(/(1)(0))(4))"))));
+    ASSERT(fp_eq(evaluateLispExpression("(median(8)(7)(4)(5)(9)(1)(2)(3)(6))"), 5));
+    ASSERT(fp_eq(evaluateLispExpression("(median(8)(7)(4)(5)(9)(1)(2)(3)(6)(0))"), 4.5));
+
+    HashTable variables = createHashTable();
+
+    hashInsert(variables, "a", 3);
+    hashInsert(variables, "b", -7);
+
+    ASSERT(fp_eq(evaluateLispExpressionWithVars("(*(a)(2))", variables), 6));
+    ASSERT(fp_eq(evaluateLispExpressionWithVars("(+(a)(b))", variables), -4));
+    ASSERT(isnan((float)evaluateLispExpressionWithVars("(+(4)(c))", variables)));
+    ASSERT(fp_eq(evaluateLispExpressionWithVars("(=(c)(8))", variables), 8));
+    ASSERT(fp_eq(evaluateLispExpressionWithVars("(+(4)(c))", variables), 12));
+    ASSERT(fp_eq(evaluateLispExpressionWithVars("(=(a)(/(1)(2)))", variables), 0.5));
+
+    /* TODO: should this use case really be supported ??? */
+    ASSERT(fp_eq(evaluateLispExpressionWithVars("(+(=(d)(4))(c))", variables), 12));
+    ASSERT(fp_eq(evaluateLispExpressionWithVars("(+(4)(d))", variables), 8));
+
+    ASSERT(isnan((float)evaluateLispExpressionWithVars("(=(c)(/(5)(0)))", variables)));
+    ASSERT(isnan((float)evaluateLispExpressionWithVars("(=(e)(/(5)(0)))", variables)));
+
+    ASSERT(fp_eq(evaluateLispExpressionWithVars("(a)", variables), 0.5));
+    ASSERT(fp_eq(evaluateLispExpressionWithVars("(b)", variables), -7));
+    ASSERT(fp_eq(evaluateLispExpressionWithVars("(c)", variables), 8));
+    ASSERT(fp_eq(evaluateLispExpressionWithVars("(d)", variables), 4));
+    ASSERT(!hashContains(variables, "e"));
+
+    destroyHashTable(variables);
+
 }
 
 void test_hashtable() 
@@ -251,48 +294,16 @@ void test_variable_file_parsing()
 
 void test_expression_to_string()
 {
-    char buffer[100];
-    Tree* tree;
-
-    tree = parseLispExpression("(+(5)(2))");
-    expressionToString(tree, buffer, sizeof(buffer));
-    ASSERT_EQ_STR(buffer, "(5+2)");
-    destroyTree(tree);
-
-    tree = parseLispExpression("(=(a)(3))");
-    expressionToString(tree, buffer, sizeof(buffer));
-    ASSERT_EQ_STR(buffer, "(a=3)");
-    destroyTree(tree);
-
-    tree = parseLispExpression("(+(a)(*(3)(2)))");
-    expressionToString(tree, buffer, sizeof(buffer));
-    ASSERT_EQ_STR(buffer, "(a+(3*2))");
-    destroyTree(tree);
-
-    tree = parseLispExpression("(=(b)(+(a)(1)))");
-    expressionToString(tree, buffer, sizeof(buffer));
-    ASSERT_EQ_STR(buffer, "(b=(a+1))");
-    destroyTree(tree);
-
-    tree = parseLispExpression("(<>)");
-    expressionToString(tree, buffer, sizeof(buffer));
-    ASSERT_EQ_STR(buffer, "(<>)");
-    destroyTree(tree);
-
-    tree = parseLispExpression("(-(1))");
-    expressionToString(tree, buffer, sizeof(buffer));
-    ASSERT_EQ_STR(buffer, "-1"); /* TODO: is this the right string to expect ? */
-    destroyTree(tree);
-
-    tree = parseLispExpression("(+(+(-(+(-(2))))))");
-    expressionToString(tree, buffer, sizeof(buffer));
-    ASSERT_EQ_STR(buffer, "++-+-2"); /* TODO: is this the right string to expect ? */
-    destroyTree(tree);
-
-    tree = parseLispExpression("(max(5)(32)(+(17)(5)))");
-    expressionToString(tree, buffer, sizeof(buffer));
-    ASSERT_EQ_STR(buffer, "max(5, 32, (17+5))"); /* TODO: is this the right string to expect ? */
-    destroyTree(tree);
+    ASSERT(check_single_expression_to_string("(+(5)(2))", "(5+2)"));
+    ASSERT(check_single_expression_to_string("(=(a)(3))", "(a=3)"));
+    ASSERT(check_single_expression_to_string("(+(a)(*(3)(2)))", "(a+(3*2))"));
+    ASSERT(check_single_expression_to_string("(=(b)(+(a)(1)))", "(b=(a+1))"));
+    ASSERT(check_single_expression_to_string("(<>)", "(<>)"));
+    ASSERT(check_single_expression_to_string("(1)", "(1)"));
+    ASSERT(check_single_expression_to_string("(-(1))", "(-1)"));
+    ASSERT(check_single_expression_to_string("(+(+(-(+(-(2))))))", "(+(+(-(+(-2)))))"));
+    ASSERT(check_single_expression_to_string("(max(5)(32)(+(17)(5)))", "(max(5,32,(17+5)))"));
+    /* TODO: add more test cases */
 }
 
 int main()
@@ -324,10 +335,29 @@ Tree* createTreeFromLiteral(const char* string)
 
 double evaluateLispExpression(char* expression)
 {
+    HashTable variables = createHashTable();
+    double res = evaluateLispExpressionWithVars(expression, variables);
+    destroyHashTable(variables);
+    return res;
+}
+
+double evaluateLispExpressionWithVars(char* expression, HashTable variables)
+{
     Tree* expression_tree = parseLispExpression(expression);
-    double res = evaluateExpressionTree(expression_tree);
+    double res = evaluateExpressionTree(expression_tree, variables);
     destroyTree(expression_tree);
     return res;
+}
+
+bool check_single_expression_to_string(const char* lisp_expression,
+                                       const char* expected_string)
+{
+    char buffer[MAX_LINE_LENGTH + 1];
+    Tree* tree = parseLispExpression(lisp_expression);
+    expressionToString(tree, buffer, sizeof(buffer));
+    bool test_passed = (strcmp(buffer, expected_string) == 0);
+    destroyTree(tree);
+    return test_passed;
 }
 
 /* Check floating point equality up to small error */

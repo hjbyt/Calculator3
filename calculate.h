@@ -6,7 +6,9 @@
 #define CALCULATE_H_
 
 #include "tree.h"
+#include "hashtable.h"
 
+/* TODO: update doc */
 /**
  * Evaluate (calculate) an arithmetic expression tree.
  * If the result of the evaluation is invalid, then NAN is returned.
@@ -21,6 +23,6 @@
  * @return
  *		Evaluation result.
  */
-double evaluateExpressionTree(Tree* tree);
+double evaluateExpressionTree(Tree* tree, HashTable variables);
 
 #endif /* CALCULATE_H_ */

@@ -5,7 +5,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include <float.h>
 #include <math.h>
 #include "calculate.h"
 #include "common.h"
@@ -14,80 +13,107 @@
 #include <stdio.h>
 
 /*
- * Constants
+ * Types
  */
 
-/* Operations */
-#define PLUS_OPERATION      '+'
-#define MINUS_OPERATION     '-'
-#define MULTIPLY_OPERATION  '*'
-#define DIVIDE_OPERATION    '/'
-#define SUM_RANGE_OPERATION '$'
+/* TODO: doc */
+typedef double (*EvaluatorFunc)(Tree*, HashTable);
+
+/* TODO: doc */
+typedef struct OperationAndEvaluator_
+{
+    char* operation_string;
+    EvaluatorFunc evaluator;
+} OperationAndEvaluator;
 
 /*
  * Internal Function Declarations
  */
 
-double evaluateNumberExpression(Tree* tree);
-double evaluatePlusExpression(Tree* tree);
-double evaluateMinusExpression(Tree* tree);
-double evaluateMultiplyExpression(Tree* tree);
-double evaluateDivideExpression(Tree* tree);
-double evaluateSumRangeExpression(Tree* tree);
-double evaluateMinExpression(Tree* tree);
-double evaluateMaxExpression(Tree* tree);
-long rangeSum(long a, long b);
+EvaluatorFunc getEvaluator(char* operation_string);
+double evaluateTerminalExpression(Tree* tree, HashTable variables);
+double evaluatePlusExpression(Tree* tree, HashTable variables);
+double evaluateMinusExpression(Tree* tree, HashTable variables);
+double evaluateMultiplyExpression(Tree* tree, HashTable variables);
+double evaluateDivideExpression(Tree* tree, HashTable variables);
+double evaluateSumRangeExpression(Tree* tree, HashTable variables);
+double evaluateAssignmentExpression(Tree* tree, HashTable variables);
+double evaluateMinExpression(Tree* tree, HashTable variables);
+double evaluateMaxExpression(Tree* tree, HashTable variables);
+double evaluateAverageExpression(Tree* tree, HashTable variables);
+double evaluateMedianExpression(Tree* tree, HashTable variables);
+long long int  rangeSum(long long int  a, long long int  b);
 bool isNumber(const char* string);
 bool isDigit(char c);
+int compareDouble(const void* a, const void* b);
+
+/*
+ * Constants
+ */
+
+/* TODO: doc */
+#define EQUALITY_THRESHOLD 0.000001
+
+/* TODO: doc */
+const OperationAndEvaluator OPERATIONS[] = {
+        {"+",       evaluatePlusExpression      },
+        {"-",       evaluateMinusExpression     },
+        {"*",       evaluateMultiplyExpression  },
+        {"/",       evaluateDivideExpression    },
+        {"$",       evaluateSumRangeExpression  },
+        {"=",       evaluateAssignmentExpression},
+        {"min",     evaluateMinExpression       },
+        {"max",     evaluateMaxExpression       },
+        {"average", evaluateAverageExpression   },
+        {"median",  evaluateMedianExpression    },
+};
 
 /*
  * Module Functions
  */
 
-double evaluateExpressionTree(Tree* tree)
+double evaluateExpressionTree(Tree* tree, HashTable variables)
 {
     VERIFY(tree != NULL);
 
     if (!hasChildren(tree)) {
-        return evaluateNumberExpression(tree);
+        return evaluateTerminalExpression(tree, variables);
     }
 
-    char* operator_string = getValue(tree);
-    
-    if (strlen(operator_string) == 1) {
-        char operator = *operator_string;
+    char* operation_string = getValue(tree);
+    EvaluatorFunc evaluator = getEvaluator(operation_string);
+    VERIFY(evaluator != NULL);
 
-        switch (operator)
-        {
-            case PLUS_OPERATION:
-                return evaluatePlusExpression(tree);
-            case MINUS_OPERATION:
-                return evaluateMinusExpression(tree);
-            case MULTIPLY_OPERATION:
-                return evaluateMultiplyExpression(tree);
-            case DIVIDE_OPERATION:
-                return evaluateDivideExpression(tree);
-            case SUM_RANGE_OPERATION:
-                return evaluateSumRangeExpression(tree);
-            default:
-                panic();
-        }    
-    } else {
-        if (0 == strcmp(operator_string, "min"))
-            return evaluateMinExpression(tree);
-        else if (0 == strcmp(operator_string, "max"))
-            return evaluateMaxExpression(tree);
-        else
-            panic();
-    }
+    /* Evaluate operation */
+    return evaluator(tree, variables);
 }
 
 /*
  * Internal Functions
  */
 
+/* TODO: doc */
+EvaluatorFunc getEvaluator(char* operation_string)
+{
+    OperationAndEvaluator operation_pair;
+    bool found = false;
+    for (int i = 0; i < ARRAY_LENGTH(OPERATIONS); ++i)
+    {
+        operation_pair = OPERATIONS[i];
+        if (strcmp(operation_string, operation_pair.operation_string) == 0) {
+            found = true;
+            break;
+        }
+    }
+    if (found) {
+        return operation_pair.evaluator;
+    } else {
+        return NULL;
+    }
+}
+
 /**
- * Evaluate a number expression sub-tree (tree leaf).
+ * Evaluate a terminal (number or variable) expression sub-tree (tree leaf).
  *
  * @param
  * 		Tree* tree - Expression sub-tree to evaluate.
@@ -100,13 +126,23 @@ double evaluateExpressionTree(Tree* tree)
  * @return
  *		Evaluation result.
  */
-double evaluateNumberExpression(Tree* tree)
+double evaluateTerminalExpression(Tree* tree, HashTable variables)
 {
     VERIFY(tree != NULL);
     VERIFY(!hasChildren(tree));
-    char* number_string = getValue(tree);
-    VERIFY(isNumber(number_string));
-    return (double)atoi(number_string);
+    char* terminal = getValue(tree);
+    if (isName(terminal)) {
+        if (hashContains(variables, terminal)) {
+            /* TODO: check that name != min/max/average/mean ??? */
+            return hashGetValue(variables, terminal);
+        } else {
+            return NAN;
+        }
+    } else if (isNumber(terminal)) {
+        return (double)atoi(terminal);
+    } else {
+        panic();
+    }
 }
 
 /**
@@ -122,16 +158,16 @@ double evaluateNumberExpression(Tree* tree)
  * @return
  *		Evaluation result.
  */
-double evaluatePlusExpression(Tree* tree)
+double evaluatePlusExpression(Tree* tree, HashTable variables)
 {
     VERIFY(tree != NULL);
     switch (childrenCount(tree)) {
         case 1:
-            return evaluateExpressionTree(firstChild(tree));
+            return evaluateExpressionTree(firstChild(tree), variables);
         case 2:
         {
-            double a = evaluateExpressionTree(firstChild(tree));
-            double b = evaluateExpressionTree(lastChild(tree));
+            double a = evaluateExpressionTree(firstChild(tree), variables);
+            double b = evaluateExpressionTree(lastChild(tree), variables);
             return a + b;
         }
         default:
@@ -152,17 +188,17 @@ double evaluatePlusExpression(Tree* tree)
  * @return
  *		Evaluation result.
  */
-double evaluateMinusExpression(Tree* tree)
+double evaluateMinusExpression(Tree* tree, HashTable variables)
 {
     VERIFY(tree != NULL);
     switch (childrenCount(tree))
     {
         case 1:
-            return -evaluateExpressionTree(firstChild(tree));
+            return -evaluateExpressionTree(firstChild(tree), variables);
         case 2:
         {
-            double a = evaluateExpressionTree(firstChild(tree));
-            double b = evaluateExpressionTree(lastChild(tree));
+            double a = evaluateExpressionTree(firstChild(tree), variables);
+            double b = evaluateExpressionTree(lastChild(tree), variables);
             return a - b;
         }
         default:
@@ -183,12 +219,12 @@ double evaluateMinusExpression(Tree* tree)
  * @return
  *		Evaluation result.
  */
-double evaluateMultiplyExpression(Tree* tree)
+double evaluateMultiplyExpression(Tree* tree, HashTable variables)
 {
     VERIFY(tree != NULL);
     VERIFY(childrenCount(tree) == 2);
-    double a = evaluateExpressionTree(firstChild(tree));
-    double b = evaluateExpressionTree(lastChild(tree));
+    double a = evaluateExpressionTree(firstChild(tree), variables);
+    double b = evaluateExpressionTree(lastChild(tree), variables);
     return a * b;
 }
 
@@ -206,12 +242,12 @@ double evaluateMultiplyExpression(Tree* tree)
  * @return
  *		Evaluation result.
  */
-double evaluateDivideExpression(Tree* tree)
+double evaluateDivideExpression(Tree* tree, HashTable variables)
 {
     VERIFY(tree != NULL);
     VERIFY(childrenCount(tree) == 2);
-    double a = evaluateExpressionTree(firstChild(tree));
-    double b = evaluateExpressionTree(lastChild(tree));
+    double a = evaluateExpressionTree(firstChild(tree), variables);
+    double b = evaluateExpressionTree(lastChild(tree), variables);
     if (b == 0) {
         return NAN;
     } else {
@@ -233,49 +269,145 @@ double evaluateDivideExpression(Tree* tree)
  * @return
  *		Evaluation result.
  */
-double evaluateSumRangeExpression(Tree* tree)
+double evaluateSumRangeExpression(Tree* tree, HashTable variables)
 {
     VERIFY(tree != NULL);
     VERIFY(childrenCount(tree) == 2);
-    long a = (long)evaluateExpressionTree(firstChild(tree));
-    long b = (long)evaluateExpressionTree(lastChild(tree));
-    if (a > b) {
+
+    double a_ = evaluateExpressionTree(firstChild(tree), variables);
+    double b_ = evaluateExpressionTree(lastChild(tree), variables);
+
+    long long int a = llround(a_);
+    long long int b = llround(b_);
+
+    if (   fabs(a_ - (double)a) > EQUALITY_THRESHOLD
+        || fabs(b_ - (double)b) > EQUALITY_THRESHOLD
+        || a > b) {
         return NAN;
     } else {
-        return rangeSum(a, b);
+        return (double)rangeSum(a, b);
     }
 }
 
-double evaluateMinExpression(Tree* tree)
+/* TODO: doc */
+double evaluateAssignmentExpression(Tree* tree, HashTable variables)
+{
+    VERIFY(tree != NULL);
+    VERIFY(childrenCount(tree) == 2);
+
+    double value = evaluateExpressionTree(lastChild(tree), variables);
+    if (isnan((float)value)) {
+        return NAN;
+    }
+
+    /* TODO: check that name != min/max/average/mean ??? */
+    char* name = getValue(firstChild(tree));
+    hashInsert(variables, name, value);
+
+    return value;
+}
+
+/* TODO: doc */
+double evaluateMinExpression(Tree* tree, HashTable variables)
 {
     VERIFY(NULL != tree);
     VERIFY(hasChildren(tree));
-    Tree* child = firstChild(tree);
-    double minValue = DBL_MAX;
-    
-    while (child) {
-        double current = evaluateExpressionTree(child);
+
+    double minValue = NAN;
+    for (Tree* child = firstChild(tree);
+         child != NULL;
+         child = nextBrother(child))
+    {
+        double current = evaluateExpressionTree(child, variables);
+        if (isnan((float)current)) {
+            return NAN;
+        }
         minValue = fmin(minValue, current);
-        child = nextBrother(child);
     }
     
     return minValue;
 }
 
-double evaluateMaxExpression(Tree* tree)
+/* TODO: doc */
+double evaluateMaxExpression(Tree* tree, HashTable variables)
 {
     VERIFY(NULL != tree);
     VERIFY(hasChildren(tree));
-    Tree* child = firstChild(tree);
-    double maxValue = -DBL_MAX;
-    
-    while (child) {
-        double current = evaluateExpressionTree(child);
+
+    double maxValue = NAN;
+    for (Tree* child = firstChild(tree);
+         child != NULL;
+         child = nextBrother(child))
+    {
+        double current = evaluateExpressionTree(child, variables);
+        if (isnan((float)current)) {
+            return NAN;
+        }
         maxValue = fmax(maxValue, current);
-        child = nextBrother(child);
     }
     
     return maxValue;
+}
+
+/* TODO: doc */
+double evaluateAverageExpression(Tree* tree, HashTable variables)
+{
+    VERIFY(NULL != tree);
+    VERIFY(hasChildren(tree));
+
+    double sum = 0;
+    for (Tree* child = firstChild(tree);
+         child != NULL;
+         child = nextBrother(child))
+    {
+        double current = evaluateExpressionTree(child, variables);
+        if (isnan((float)current)) {
+            return NAN;
+        }
+        sum += current;
+    }
+
+    return sum / (double)childrenCount(tree);
+}
+
+/* TODO: doc */
+double evaluateMedianExpression(Tree* tree, HashTable variables)
+{
+    VERIFY(NULL != tree);
+    VERIFY(hasChildren(tree));
+
+    unsigned int operands_count = childrenCount(tree);
+    double* operands = malloc(operands_count * sizeof(double));
+    VERIFY(operands != NULL);
+
+    int i = 0;
+    for (Tree* child = firstChild(tree);
+         child != NULL;
+         child = nextBrother(child))
+    {
+        double current = evaluateExpressionTree(child, variables);
+        if (isnan((float)operands[i])) {
+            return NAN;
+        }
+        operands[i] = current;
+        i += 1;
+    }
+
+    /* Note: using quickselect would be better,
+     * but because it's promised that the number of operands is not greater than 10,
+     * it doesn't really matter. */
+    qsort(operands, operands_count, sizeof(*operands), compareDouble);
+
+    double result;
+    if (operands_count % 2 == 1) {
+        result = operands[(operands_count - 1)/2];
+    } else {
+        result = (operands[operands_count/2] + operands[operands_count/2 - 1]) / 2;
+    }
+
+    free(operands);
+
+    return result;
 }
 
 /**
@@ -291,54 +423,22 @@ double evaluateMaxExpression(Tree* tree)
  * @return
  *      Calculation result.
  */
-long rangeSum(long a, long b)
+long long int rangeSum(long long int  a, long long int  b)
 {
     VERIFY(a <= b);
     return (a + b) * (b - a + 1) / 2;
 }
 
-/**
- * Check if the given string is a number made of digits only.
- * Note: this function returns false for strings such as: "-123", "+123", "1.0".
- *
- * @param
- *      const char* string - String to check.
- *
- * @preconditions
- *      string != NULL
- *
- * @return
- *      true iff string is a number made of digits only.
- */
-bool isNumber(const char* string)
+/* TODO: doc */
+int compareDouble(const void* a, const void* b)
 {
-    VERIFY(string != NULL);
-    const char* c = string;
-
-    if (*c == '\0') {
-        return false;
+    double a_ = *(double*)a;
+    double b_ = *(double*)b;
+    if (a_ < b_) {
+        return -1;
+    } else if (a_ == b_) {
+        return 0;
+    } else {
+        return 1;
     }
-
-    do {
-        if (!isDigit(*c)) {
-            return false;
-        }
-        c++;
-    } while (*c != '\0');
-
-    return true;
-}
-
-/**
- * Check if the given character is a digit.
- *
- * @param
- *      char c - Character to check.
- *
- * @return
- *      true iff c is a digit.
- */
-bool isDigit(char c)
-{
-    return (c >= '0' && c <= '9');
 }
