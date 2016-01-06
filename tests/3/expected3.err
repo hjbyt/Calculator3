@@ -1,2 +1,2 @@
 line 1:2 no viable alternative at input '*'
-Invalid Expression : 1+*2
+Invalid Expression : 1+*2;
