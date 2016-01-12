@@ -3,12 +3,12 @@ for i in {1..5}
 do 
     mkdir -p out_new/$i
     
-    
-    if [ -f test.txt ]; then
-        VAR_FILE_OPTION = -v tests_new/$i/test$i.v
+    if [ -f tests_new/$i/test$i.v ]; then
+        java SP.SPCalculatorMain -i tests_new/$i/test$i.in -e out_new/$i/test$i.err | ./SPCalculator -v tests_new/$i/test$i.v -o out_new/$i/test$i.out
+    else
+        java SP.SPCalculatorMain -i tests_new/$i/test$i.in -e out_new/$i/test$i.err | ./SPCalculator -o out_new/$i/test$i.out
     fi
     
-    java SP.SPCalculatorMain -i tests_new/$i/test$i.in -e out_new/$i/test$i.err | ./SPCalculator $VAR_FILE_OPTION -o out_new/$i/test$i.out
     diff out_new/$i/test$i.out tests_new/$i/expected$i.out > out_new/$i/test$i.out.diff || echo There is a problem with test $i
     
 done
