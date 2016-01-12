@@ -133,7 +133,6 @@ double evaluateTerminalExpression(Tree* tree, HashTable variables)
     char* terminal = getValue(tree);
     if (isName(terminal)) {
         if (hashContains(variables, terminal)) {
-            /* TODO: check that name != min/max/average/mean ??? */
             return hashGetValue(variables, terminal);
         } else {
             return NAN;
@@ -300,8 +299,10 @@ double evaluateAssignmentExpression(Tree* tree, HashTable variables)
         return NAN;
     }
 
-    /* TODO: check that name != min/max/average/mean ??? */
-    char* name = getValue(firstChild(tree));
+    Tree* var_expression = firstChild(tree);
+    VERIFY(!hasChildren(var_expression));
+    char* name = getValue(var_expression);
+    VERIFY(isName(name));
     hashInsert(variables, name, value);
 
     return value;

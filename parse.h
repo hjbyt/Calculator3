@@ -48,6 +48,9 @@ Tree* parseLispExpression(const char* string);
  */
 void printLisp(Tree* tree);
 
+/* TODO: doc */
+bool isAssignmentCommnd(Tree* tree);
+
 /**
  * Check if the given expression tree represents the quit command.
  *

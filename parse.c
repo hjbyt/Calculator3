@@ -53,6 +53,12 @@ void printLisp(Tree* tree)
     printf("\n");
 }
 
+bool isAssignmentCommnd(Tree* tree)
+{
+    VERIFY(tree != NULL);
+    return (strcmp(getValue(tree), "=") == 0);
+}
+
 bool isEndCommand(Tree* tree)
 {
     VERIFY(tree != NULL);
