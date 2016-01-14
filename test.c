@@ -32,9 +32,9 @@
 Tree* createTreeFromLiteral(const char* string);
 double evaluateLispExpression(char* expression);
 double evaluateLispExpressionWithVars(char* expression, HashTable variables);
-bool check_single_expression_to_string(const char* lisp_expression,
+bool checkSingleExpressionToString(const char* lisp_expression,
                                        const char* expected_string);
-bool fp_eq(double a, double b);
+bool fpEq(double a, double b);
 
 /*
  * Tests
@@ -132,24 +132,24 @@ void test_parse()
 
 void test_calculate()
 {
-    ASSERT(fp_eq(evaluateLispExpression("(1)"), 1));
-    ASSERT(fp_eq(evaluateLispExpression("(+(1))"), 1));
-    ASSERT(fp_eq(evaluateLispExpression("(-(1))"), -1));
-    ASSERT(fp_eq(evaluateLispExpression("(-(-(1)))"), 1));
-    ASSERT(fp_eq(evaluateLispExpression("(+(1)(2))"), 3));
-    ASSERT(fp_eq(evaluateLispExpression("(-(1)(2))"), -1));
-    ASSERT(fp_eq(evaluateLispExpression("(*(3)(2))"), 6));
-    ASSERT(fp_eq(evaluateLispExpression("(/(3)(2))"), 1.5));
+    ASSERT(fpEq(evaluateLispExpression("(1)"), 1));
+    ASSERT(fpEq(evaluateLispExpression("(+(1))"), 1));
+    ASSERT(fpEq(evaluateLispExpression("(-(1))"), -1));
+    ASSERT(fpEq(evaluateLispExpression("(-(-(1)))"), 1));
+    ASSERT(fpEq(evaluateLispExpression("(+(1)(2))"), 3));
+    ASSERT(fpEq(evaluateLispExpression("(-(1)(2))"), -1));
+    ASSERT(fpEq(evaluateLispExpression("(*(3)(2))"), 6));
+    ASSERT(fpEq(evaluateLispExpression("(/(3)(2))"), 1.5));
     ASSERT(isnan((float)evaluateLispExpression("(/(3)(0))")));
-    ASSERT(fp_eq(evaluateLispExpression("($(2)(3))"), 5));
-    ASSERT(fp_eq(evaluateLispExpression("($(-(5))(10))"), 40));
+    ASSERT(fpEq(evaluateLispExpression("($(2)(3))"), 5));
+    ASSERT(fpEq(evaluateLispExpression("($(-(5))(10))"), 40));
     ASSERT(isnan((float)evaluateLispExpression("($(3)(2))")));
     ASSERT(isnan((float)evaluateLispExpression("($(2)(/(11)(5)))")));
     ASSERT(isnan((float)evaluateLispExpression("($(/(11)(5))(2))")));
 
     // the following expressions is equivalent to: "1 + --+2 * 3 $ 5 * (-6) - 4 / 2 $ 2 / (1 + 4)".
     // (checks proper evaluation of complex expression)
-    ASSERT(fp_eq(evaluateLispExpression("(-(+(1)(*(*(-(-(+(2))))($(3)(5)))(-(6))))(/(/(4)($(2)(2)))(+(1)(4))))"), -143.4));
+    ASSERT(fpEq(evaluateLispExpression("(-(+(1)(*(*(-(-(+(2))))($(3)(5)))(-(6))))(/(/(4)($(2)(2)))(+(1)(4))))"), -143.4));
     // the following expressions is equivalent to: "1 + --+2 * 3 $ 5 * (-6) - 4 / 2 $ 0 / (1 + 4)".
     // (checks proper propagation of NAN result from "2 $ 0")
     ASSERT(isnan((float)evaluateLispExpression("(-(+(1)(*(*(-(-(+(2))))($(3)(5)))(-(6))))(/(/(4)($(2)(1)))(+(1)(4))))")));
@@ -157,36 +157,36 @@ void test_calculate()
     // (checks proper propagation of NAN result from division by zero)
     ASSERT(isnan((float)evaluateLispExpression("(-(+(1)(*(*(-(-(+(2))))($(3)(5)))(-(6))))(/(/(4)($(2)(1)))(+(1)(4))))")));
 
-    ASSERT(fp_eq(evaluateLispExpression("(max(3)(-(2))(4))"), 4));
-    ASSERT(fp_eq(evaluateLispExpression("(min(3)(-(2))(4))"), -2));
+    ASSERT(fpEq(evaluateLispExpression("(max(3)(-(2))(4))"), 4));
+    ASSERT(fpEq(evaluateLispExpression("(min(3)(-(2))(4))"), -2));
     ASSERT(isnan((float)(evaluateLispExpression("(max(3)(/(1)(0))(4))"))));
     ASSERT(isnan((float)(evaluateLispExpression("(min(3)($(5)(2))(4))"))));
-    ASSERT(fp_eq(evaluateLispExpression("(average(3)(-(2))(4))"), 1.6666666666666667));
+    ASSERT(fpEq(evaluateLispExpression("(average(3)(-(2))(4))"), 1.6666666666666667));
     ASSERT(isnan((float)(evaluateLispExpression("(average(3)(/(1)(0))(4))"))));
-    ASSERT(fp_eq(evaluateLispExpression("(median(3)(-(2))(4))"), 3));
-    ASSERT(fp_eq(evaluateLispExpression("(median(3)(-(2))(5)(4))"), 3.5));
+    ASSERT(fpEq(evaluateLispExpression("(median(3)(-(2))(4))"), 3));
+    ASSERT(fpEq(evaluateLispExpression("(median(3)(-(2))(5)(4))"), 3.5));
     ASSERT(isnan((float)(evaluateLispExpression("(median(3)(/(1)(0))(4))"))));
-    ASSERT(fp_eq(evaluateLispExpression("(median(8)(7)(4)(5)(9)(1)(2)(3)(6))"), 5));
-    ASSERT(fp_eq(evaluateLispExpression("(median(8)(7)(4)(5)(9)(1)(2)(3)(6)(0))"), 4.5));
+    ASSERT(fpEq(evaluateLispExpression("(median(8)(7)(4)(5)(9)(1)(2)(3)(6))"), 5));
+    ASSERT(fpEq(evaluateLispExpression("(median(8)(7)(4)(5)(9)(1)(2)(3)(6)(0))"), 4.5));
 
     HashTable variables = createHashTable();
 
     hashInsert(variables, "a", 3);
     hashInsert(variables, "b", -7);
 
-    ASSERT(fp_eq(evaluateLispExpressionWithVars("(*(a)(2))", variables), 6));
-    ASSERT(fp_eq(evaluateLispExpressionWithVars("(+(a)(b))", variables), -4));
+    ASSERT(fpEq(evaluateLispExpressionWithVars("(*(a)(2))", variables), 6));
+    ASSERT(fpEq(evaluateLispExpressionWithVars("(+(a)(b))", variables), -4));
     ASSERT(isnan((float)evaluateLispExpressionWithVars("(+(4)(c))", variables)));
-    ASSERT(fp_eq(evaluateLispExpressionWithVars("(=(c)(8))", variables), 8));
-    ASSERT(fp_eq(evaluateLispExpressionWithVars("(+(4)(c))", variables), 12));
-    ASSERT(fp_eq(evaluateLispExpressionWithVars("(=(a)(/(1)(2)))", variables), 0.5));
+    ASSERT(fpEq(evaluateLispExpressionWithVars("(=(c)(8))", variables), 8));
+    ASSERT(fpEq(evaluateLispExpressionWithVars("(+(4)(c))", variables), 12));
+    ASSERT(fpEq(evaluateLispExpressionWithVars("(=(a)(/(1)(2)))", variables), 0.5));
 
     ASSERT(isnan((float)evaluateLispExpressionWithVars("(=(c)(/(5)(0)))", variables)));
     ASSERT(isnan((float)evaluateLispExpressionWithVars("(=(e)(/(5)(0)))", variables)));
 
-    ASSERT(fp_eq(evaluateLispExpressionWithVars("(a)", variables), 0.5));
-    ASSERT(fp_eq(evaluateLispExpressionWithVars("(b)", variables), -7));
-    ASSERT(fp_eq(evaluateLispExpressionWithVars("(c)", variables), 8));
+    ASSERT(fpEq(evaluateLispExpressionWithVars("(a)", variables), 0.5));
+    ASSERT(fpEq(evaluateLispExpressionWithVars("(b)", variables), -7));
+    ASSERT(fpEq(evaluateLispExpressionWithVars("(c)", variables), 8));
     ASSERT(!hashContains(variables, "e"));
 
     destroyHashTable(variables);
@@ -205,25 +205,25 @@ void test_hashtable()
     hashInsert(table, "e", 2.71828);
     ASSERT(4 == hashGetSize(table));
     ASSERT(!hashIsEmpty(table));
-    ASSERT(fp_eq(2.71828, hashGetValue(table, "e")));
-    ASSERT(fp_eq(3.1415, hashGetValue(table, "pi")));
-    ASSERT(fp_eq(5, hashGetValue(table, "first")));
-    ASSERT(fp_eq(5.5, hashGetValue(table, "second")));
+    ASSERT(fpEq(2.71828, hashGetValue(table, "e")));
+    ASSERT(fpEq(3.1415, hashGetValue(table, "pi")));
+    ASSERT(fpEq(5, hashGetValue(table, "first")));
+    ASSERT(fpEq(5.5, hashGetValue(table, "second")));
     ASSERT(hashContains(table, "first"));
     hashInsert(table, "first", 6);
     hashInsert(table, "second", 9);
-    ASSERT(fp_eq(4, hashGetSize(table)));
-    ASSERT(fp_eq(2.71828, hashGetValue(table, "e")));
-    ASSERT(fp_eq(3.1415, hashGetValue(table, "pi")));
-    ASSERT(fp_eq(6, hashGetValue(table, "first")));
-    ASSERT(fp_eq(9, hashGetValue(table, "second")));
+    ASSERT(fpEq(4, hashGetSize(table)));
+    ASSERT(fpEq(2.71828, hashGetValue(table, "e")));
+    ASSERT(fpEq(3.1415, hashGetValue(table, "pi")));
+    ASSERT(fpEq(6, hashGetValue(table, "first")));
+    ASSERT(fpEq(9, hashGetValue(table, "second")));
     ASSERT(hashContains(table, "first"));
     hashDelete(table, "first");
     hashDelete(table, "second");
     ASSERT(2 == hashGetSize(table));
     ASSERT(!hashIsEmpty(table));
-    ASSERT(fp_eq(2.71828, hashGetValue(table, "e")));
-    ASSERT(fp_eq(3.1415, hashGetValue(table, "pi")));
+    ASSERT(fpEq(2.71828, hashGetValue(table, "e")));
+    ASSERT(fpEq(3.1415, hashGetValue(table, "pi")));
     ASSERT(!hashContains(table, "first"));
     destroyHashTable(table);
     
@@ -237,24 +237,24 @@ void test_hashtable()
     hashInsert(table2, "U4BQBV", 3);
     hashInsert(table2, "2V66VL", 4);
     hashInsert(table2, "PNTKJK", 5);
-    ASSERT(fp_eq(1, hashGetValue(table2, "0UDBZE")));
-    ASSERT(fp_eq(2, hashGetValue(table2, "YYHMYZ")));
-    ASSERT(fp_eq(3, hashGetValue(table2, "U4BQBV")));
-    ASSERT(fp_eq(4, hashGetValue(table2, "2V66VL")));
-    ASSERT(fp_eq(5, hashGetValue(table2, "PNTKJK")));
+    ASSERT(fpEq(1, hashGetValue(table2, "0UDBZE")));
+    ASSERT(fpEq(2, hashGetValue(table2, "YYHMYZ")));
+    ASSERT(fpEq(3, hashGetValue(table2, "U4BQBV")));
+    ASSERT(fpEq(4, hashGetValue(table2, "2V66VL")));
+    ASSERT(fpEq(5, hashGetValue(table2, "PNTKJK")));
     hashInsert(table2, "0UDBZE", 10);
     hashInsert(table2, "YYHMYZ", 20);
     ASSERT(hashContains(table2, "YYHMYZ"));
-    ASSERT(fp_eq(10, hashGetValue(table2, "0UDBZE")));
-    ASSERT(fp_eq(20, hashGetValue(table2, "YYHMYZ")));
-    ASSERT(fp_eq(3, hashGetValue(table2, "U4BQBV")));
-    ASSERT(fp_eq(4, hashGetValue(table2, "2V66VL")));
-    ASSERT(fp_eq(5, hashGetValue(table2, "PNTKJK")));
+    ASSERT(fpEq(10, hashGetValue(table2, "0UDBZE")));
+    ASSERT(fpEq(20, hashGetValue(table2, "YYHMYZ")));
+    ASSERT(fpEq(3, hashGetValue(table2, "U4BQBV")));
+    ASSERT(fpEq(4, hashGetValue(table2, "2V66VL")));
+    ASSERT(fpEq(5, hashGetValue(table2, "PNTKJK")));
     hashDelete(table2, "2V66VL");
     hashDelete(table2, "PNTKJK");
-    ASSERT(fp_eq(10, hashGetValue(table2, "0UDBZE")));
-    ASSERT(fp_eq(20, hashGetValue(table2, "YYHMYZ")));
-    ASSERT(fp_eq(3, hashGetValue(table2, "U4BQBV")));
+    ASSERT(fpEq(10, hashGetValue(table2, "0UDBZE")));
+    ASSERT(fpEq(20, hashGetValue(table2, "YYHMYZ")));
+    ASSERT(fpEq(3, hashGetValue(table2, "U4BQBV")));
     destroyHashTable(table2);
 }
 
@@ -267,37 +267,37 @@ void test_variable_file_parsing()
     char line[100] = "aaa = 111";
     parseVariableAssignmentLine(line, table);
     ASSERT(hashGetSize(table) == 1);
-    ASSERT(fp_eq(111, hashGetValue(table, "aaa")));
+    ASSERT(fpEq(111, hashGetValue(table, "aaa")));
 
     strcpy(line, "aaa  \t  = \t 222");
     parseVariableAssignmentLine(line, table);
     ASSERT(hashGetSize(table) == 1);
-    ASSERT(fp_eq(222, hashGetValue(table, "aaa")));
+    ASSERT(fpEq(222, hashGetValue(table, "aaa")));
 
     strcpy(line, "bBb = 333\n");
     parseVariableAssignmentLine(line, table);
     ASSERT(hashGetSize(table) == 2);
-    ASSERT(fp_eq(333, hashGetValue(table, "bBb")));
+    ASSERT(fpEq(333, hashGetValue(table, "bBb")));
 
     strcpy(line, "aaa = -444");
     parseVariableAssignmentLine(line, table);
     ASSERT(hashGetSize(table) == 2);
-    ASSERT(fp_eq(-444, hashGetValue(table, "aaa")));
+    ASSERT(fpEq(-444, hashGetValue(table, "aaa")));
 
     destroyHashTable(table);
 }
 
 void test_expression_to_string()
 {
-    ASSERT(check_single_expression_to_string("(+(5)(2))", "(5+2)"));
-    ASSERT(check_single_expression_to_string("(=(a)(3))", "(a=3)"));
-    ASSERT(check_single_expression_to_string("(+(a)(*(3)(2)))", "(a+(3*2))"));
-    ASSERT(check_single_expression_to_string("(=(b)(+(a)(1)))", "(b=(a+1))"));
-    ASSERT(check_single_expression_to_string("(<>)", "(<>)"));
-    ASSERT(check_single_expression_to_string("(1)", "(1)"));
-    ASSERT(check_single_expression_to_string("(-(1))", "(-1)"));
-    ASSERT(check_single_expression_to_string("(+(+(-(+(-(2))))))", "(+(+(-(+(-2)))))"));
-    ASSERT(check_single_expression_to_string("(max(5)(32)(+(17)(5)))", "(max(5,32,(17+5)))"));
+    ASSERT(checkSingleExpressionToString("(+(5)(2))", "(5+2)"));
+    ASSERT(checkSingleExpressionToString("(=(a)(3))", "(a=3)"));
+    ASSERT(checkSingleExpressionToString("(+(a)(*(3)(2)))", "(a+(3*2))"));
+    ASSERT(checkSingleExpressionToString("(=(b)(+(a)(1)))", "(b=(a+1))"));
+    ASSERT(checkSingleExpressionToString("(<>)", "(<>)"));
+    ASSERT(checkSingleExpressionToString("(1)", "(1)"));
+    ASSERT(checkSingleExpressionToString("(-(1))", "(-1)"));
+    ASSERT(checkSingleExpressionToString("(+(+(-(+(-(2))))))", "(+(+(-(+(-2)))))"));
+    ASSERT(checkSingleExpressionToString("(max(5)(32)(+(17)(5)))", "(max(5,32,(17+5)))"));
 }
 
 int main()
@@ -343,7 +343,7 @@ double evaluateLispExpressionWithVars(char* expression, HashTable variables)
     return res;
 }
 
-bool check_single_expression_to_string(const char* lisp_expression,
+bool checkSingleExpressionToString(const char* lisp_expression,
                                        const char* expected_string)
 {
     char buffer[MAX_LINE_LENGTH + 1];
@@ -355,7 +355,7 @@ bool check_single_expression_to_string(const char* lisp_expression,
 }
 
 /* Check floating point equality up to small error */
-bool fp_eq(double a, double b)
+bool fpEq(double a, double b)
 {
     const double epsilon = 0.000001;
     return (fabs(a-b) <= epsilon);
