@@ -1,0 +1,10 @@
+median(1+2,3,100,19,5$9);
+median(1,2,3,4,5,6);
+median(10/2,3+1,10);
+median(average(1,2),average(3,4),average(5,6),average(7,6));
+average(median(1,2),median(1,2,3),median(1,2,3,4),median(1,2,3,4,5));
+average(1/2,3,4,1,1+9,1*2);
+median(5/0,1);
+average(0,0);
+average(1,2,3)/median(1,2,3);
+<>;

@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <errno.h>
+ #include <errno.h>
 #include "parse.h"
 #include "common.h"
 
@@ -54,6 +54,12 @@ void printLisp(Tree* tree)
     printf("\n");
 }
 
+bool isAssignmentCommnd(Tree* tree)
+{
+    VERIFY(tree != NULL);
+    return (strcmp(getValue(tree), "=") == 0);
+}
+
 bool isEndCommand(Tree* tree)
 {
     VERIFY(tree != NULL);
@@ -79,7 +85,11 @@ void parseVariableInputFile(FILE* input_file, HashTable table)
     {
         /* Get line */
         char line[MAX_LINE_LENGTH + 1];
-        fgets(line, sizeof(line), input_file);
+        char* fgets_retval = fgets(line, sizeof(line), input_file);
+        if (fgets_retval == NULL) {
+            // end of file
+            break;
+        }
         VERIFY(!ferror(input_file));
 
         parseVariableAssignmentLine(line, table);

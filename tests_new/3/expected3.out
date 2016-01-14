@@ -1,0 +1,36 @@
+((a+b)+c)
+res = 9.00
+(max(a,b,c))
+res = 4.00
+(min(a,b,c))
+res = 2.00
+((max(a,b,c))/(min(a,b,c)))
+res = 2.00
+((min(a,b,c))$(max(a,b,c)))
+res = 9.00
+((a+c)/b)
+res = 2.00
+(((a+b)+c)*((a+b)+c))
+res = 81.00
+(a=1)
+a = 1.00
+(b=2)
+b = 2.00
+(c=3)
+c = 3.00
+((a+b)+c)
+res = 6.00
+(max(a,b,c))
+res = 3.00
+(min(a,b,c))
+res = 1.00
+((max(a,b,c))/(min(a,b,c)))
+res = 3.00
+((min(a,b,c))$(max(a,b,c)))
+res = 6.00
+((a+c)/b)
+res = 2.00
+(((a+b)+c)*((a+b)+c))
+res = 36.00
+(<>)
+Exiting...

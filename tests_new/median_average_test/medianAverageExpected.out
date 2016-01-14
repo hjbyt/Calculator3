@@ -1,0 +1,20 @@
+(median((1+2),3,100,19,(5$9)))
+res = 19.00
+(median(1,2,3,4,5,6))
+res = 3.50
+(median((10/2),(3+1),10))
+res = 5.00
+(median((average(1,2)),(average(3,4)),(average(5,6)),(average(7,6))))
+res = 4.50
+(average((median(1,2)),(median(1,2,3)),(median(1,2,3,4)),(median(1,2,3,4,5))))
+res = 2.25
+(average((1/2),3,4,1,(1+9),(1*2)))
+res = 3.42
+(median((5/0),1))
+Invalid Result
+(average(0,0))
+res = 0.00
+((average(1,2,3))/(median(1,2,3)))
+res = 1.00
+(<>)
+Exiting...

@@ -168,10 +168,19 @@ void interact(HashTable variables, FILE* output_file)
         }
 
         double result = evaluateExpressionTree(parse_tree, variables);
-        if (isnan((float)result)) {
-            fprintf(output_file, "Invalid Result\n");
+        if (isAssignmentCommnd(parse_tree)) {
+            if (isnan((float)result)) {
+                fprintf(output_file, "Invalid Assignment\n");
+            } else {
+                char* var_name = getValue(firstChild(parse_tree));
+                fprintf(output_file, "%s = %.2f\n", var_name, result);
+            }
         } else {
-            fprintf(output_file, "res = %.2f\n", result);
+            if (isnan((float)result)) {
+                fprintf(output_file, "Invalid Result\n");
+            } else {
+                fprintf(output_file, "res = %.2f\n", result);
+            }
         }
 
         destroyTree(parse_tree);

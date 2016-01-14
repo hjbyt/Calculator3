@@ -1,0 +1,17 @@
+a/c;
+a/d;
+d=a+b+c;
+a/d;
+d/a;
+a=1;
+b=2;
+c=3;
+(a/b)$(b/c);
+a+b+c+d+e;
+e=a+b+c+d;
+a+b+c+d+e;
+d=f/g;
+f=10;
+g=2;
+d=f/g;
+<>;

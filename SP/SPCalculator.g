@@ -28,18 +28,16 @@ grammar SPCalculator;
 	}
 }
 
-//Valid statement is either a termination command || an arithmetical expression followed by a semicolon || an assignment command
-stat returns [SPTree tree] 
-			//@init {setTrace(true);}
-			: 
-			e1=TERMINATION SEMICOLON {$tree = new SPTree($e1.text);}
-			| e2=exp SEMICOLON {$tree = $e2.tree;}
-			| as=assignment SEMICOLON {$tree = $as.tree;}
+
+//Valid statement is either a termination command || an arithmetical expression followed by a semicolon
+stat returns [SPTree tree] : e1=TERMINATION SEMICOLON {$tree = new SPTree($e1.text);}
+			   | a=assign  SEMICOLON {$tree = $a.tree;}
+			   | e2=exp    SEMICOLON {$tree = $e2.tree;}
  ; 
 
 exp returns [SPTree tree] : 
-			  // Number
-			   n=NUMBER {$tree = new SPTree($n.text);}
+			  // Terminal
+			   n=(NUMBER|VAR_NAME) {$tree = new SPTree($n.text);}
 			  // Sub-expression
 			  | LEFT_PARENTHESIS e1=exp RIGHT_PARENTHESIS {$tree = $e1.tree;}
 			  // List operations
@@ -53,10 +51,10 @@ exp returns [SPTree tree] :
 			  // Variables
 			  | v=VARIABLE {$tree = new SPTree($v.text);}
 			  ;
-			
-assignment returns [SPTree tree] :
-	v=VARIABLE op=EQUALS e=exp {$tree = new SPTree($op.text); $tree.insertChild(new SPTree($v.text)); $tree.insertChild($e.tree);}
-	;
+
+assign returns [SPTree tree] :
+			  v=VAR_NAME c=EQUALS e=exp {$tree = new SPTree($c.text); $tree.insertChild(new SPTree($v.text)); $tree.insertChild($e.tree);}
+			  ;
 			  
 expList returns [ ArrayList<SPTree> children ]
     @init
@@ -86,12 +84,15 @@ MINUS : '-';
 MULPTIPLY: '*';
 DIVIDE: '/';
 SUM_RANGE: '$';
+EQUALS: '=';
 MIN: 'min';
 MAX: 'max';
 MEDIAN: 'median';
 AVERAGE: 'average';
 COMMA: ',';
-EQUALS: '=';
+
+// Valid variable name
+VAR_NAME: [a-zA-Z]+;
 
 // Ignore whitespace
 WHITESPACE: [ \t\r\n]+ -> skip;
