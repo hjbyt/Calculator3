@@ -1,25 +1,32 @@
+/*
+ * Hash Table Module
+ */
 
 #include <stdlib.h>
 #include "hashtable.h"
 #include "common.h"
-#include "SPList.h"
-#include "SPListElement.h"
+
+/*
+ * TODO: doc internal functions.
+ * TODO: refactor some things ?
+ */
+
+/*
+ * Constants
+ */
 
 #define NUMBER_OF_ENTRIES (100)
 #define FIRST_PRIME (571)
 #define COEFFICIENT_PRIME (31)
 
+/*
+ * Types
+ */
+
 struct HashTable_t {
     SPList buckets[NUMBER_OF_ENTRIES];
     int numberOfValues;
 };
-
-typedef enum HashTableResult_e {
-    HT_SUCCESS = 0,
-    HT_OUT_OF_MEMORY,
-    HT_ELEMENT_ALREADY_EXSITS,
-    HT_VALUE_DOES_NOT_EXIST,
-} HashTableResult;
 
 typedef enum LookupOperation_e {
     INSERT,
@@ -27,11 +34,22 @@ typedef enum LookupOperation_e {
     GET,
 } LookupOperation;
 
-HashTableResult lookupElementByName(HashTable table, char* name, LookupOperation operation, OUT SPListElement* element);
+/*
+ * Internal Functions
+ */
+
+bool lookupElementByName(HashTable table,
+                         char* name,
+                         LookupOperation operation,
+                         OUT SPListElement* element);
 int hash(const char* str);
 
+/*
+ * Functions
+ */
 
-HashTable createHashTable() {
+HashTable createHashTable()
+{
     struct HashTable_t* table = malloc(sizeof(*table));
     VERIFY(NULL != table);
     
@@ -44,47 +62,54 @@ HashTable createHashTable() {
     return table;
 }
 
-void hashInsert(HashTable table, char* name, double value) {
+void hashInsert(HashTable table, char* name, double value)
+{
     SPListElement newElement;
-    HashTableResult result = lookupElementByName(table, name, INSERT, &newElement);
-    VERIFY(HT_SUCCESS == result);
+    bool found = lookupElementByName(table, name, INSERT, &newElement);
+    VERIFY(found);
     
     setELementValue(newElement, value);
 }
 
-double hashGetValue(HashTable table, char* name) {
+double hashGetValue(HashTable table, char* name)
+{
     SPListElement foundElement;
-    HashTableResult result = lookupElementByName(table, name, GET, &foundElement);
-    VERIFY(HT_SUCCESS == result);
+    bool found = lookupElementByName(table, name, GET, &foundElement);
+    VERIFY(found);
     
     double* foundValue = getElementValue(foundElement);
     VERIFY(NULL != foundValue);
     return *foundValue;
 }
 
-void hashDelete(HashTable table, char* name) {
+void hashDelete(HashTable table, char* name)
+{
     SPListElement foundElement;
-    HashTableResult result = lookupElementByName(table, name, DELETE, &foundElement);
-    VERIFY(HT_SUCCESS == result);
+    bool found = lookupElementByName(table, name, DELETE, &foundElement);
+    VERIFY(found);
 }
 
-bool hashContains(HashTable table, char* name) {
+bool hashContains(HashTable table, char* name)
+{
     SPListElement foundElement;
-    HashTableResult result = lookupElementByName(table, name, GET, &foundElement);
-    return (HT_SUCCESS == result);
+    bool found = lookupElementByName(table, name, GET, &foundElement);
+    return (found);
 }
 
-int hashGetSize(HashTable table) {
+int hashGetSize(HashTable table)
+{
     VERIFY(NULL != table);
     return table->numberOfValues;
 }
 
-bool hashIsEmpty(HashTable table) {
+bool hashIsEmpty(HashTable table)
+{
     VERIFY(NULL != table);
     return (table->numberOfValues == 0);
 }
 
-void destroyHashTable(HashTable table) {
+void destroyHashTable(HashTable table)
+{
     if (NULL == table) {
         return;
     }
@@ -99,7 +124,8 @@ void destroyHashTable(HashTable table) {
 }
 
 
-int hash(const char* str) {
+int hash(const char* str)
+{
     if (NULL == str) {
         return -1;
     }
@@ -114,7 +140,11 @@ int hash(const char* str) {
     return hashValue;
 }
 
-HashTableResult lookupElementByName(HashTable table, char* name, LookupOperation operation, OUT SPListElement* element) {
+bool lookupElementByName(HashTable table,
+                         char* name,
+                         LookupOperation operation,
+                         OUT SPListElement* element)
+{
     VERIFY(NULL != table);
     
     int nameHash = hash(name);
@@ -126,17 +156,16 @@ HashTableResult lookupElementByName(HashTable table, char* name, LookupOperation
             if (DELETE == operation) {
                 table->numberOfValues--;
                 listRemoveCurrent(bucket);
-                return HT_SUCCESS;
-            }
-            else if (INSERT == operation || GET == operation) {
+                return true;
+            } else if (INSERT == operation || GET == operation) {
                 *element = listGetCurrent(bucket);
-                return HT_SUCCESS;   
+                return true;
             }
         }
     }
     
     if (INSERT != operation) {
-        return HT_VALUE_DOES_NOT_EXIST;
+        return false;
     }
     
     *element = createElement(name, 0);
@@ -148,5 +177,5 @@ HashTableResult lookupElementByName(HashTable table, char* name, LookupOperation
     *element = listGetCurrent(bucket);
     table->numberOfValues++;
     
-    return HT_SUCCESS;
+    return true;
 }
