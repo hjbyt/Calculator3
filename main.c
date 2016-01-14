@@ -21,6 +21,7 @@
  * Structs
  */
 
+/* Container for parsed command line arguments */
 typedef struct CommandLineArgs_
 {
     char* variable_input_file;
@@ -109,9 +110,24 @@ end:
  * Internal Functions
  */
 
-/* TODO: doc */
+/**
+ * Parse the command line arguments (given to main).
+ *
+ * @param
+ * 		int argc - Amount of strings given in argv.
+ * 		char **argv - array of string arguments,
+ * 		CommandLineArgs* parsed_args - pointer to a container which
+ * 		                               the parsed arguments are saved into.
+ *
+ * @preconditions
+ *      - argv != NULL, parsed_args != NULL
+ *
+ * @return
+ *		true iff there was an error parsing the command line arguments.
+ */
 bool parseCommandLineArguments(int argc, char **argv, CommandLineArgs* parsed_args)
 {
+    VERIFY(argv != NULL);
     VERIFY(parsed_args != NULL);
 
     /* Initialize to defaults */
@@ -139,7 +155,19 @@ bool parseCommandLineArguments(int argc, char **argv, CommandLineArgs* parsed_ar
     return false;
 }
 
-/* TODO: doc */
+/**
+ * Interact with the user, processing input line by line, until an end command is received.
+ * Each line is parsed and evaluated, and the results are printed to the given output file.
+ *
+ * @param
+ * 		HashTable variables - initial variables to use for evaluating expressions.
+ * 		                      Note: this table is updated by assignment expressions.
+ * 		FILE* output_file - file which output will be printed into.
+ * 		                    If NULL is passed, then stdout is used for output.
+ *
+ * @preconditions
+ *      - variables != NULL
+ */
 void interact(HashTable variables, FILE* output_file)
 {
     bool should_print_expression = true;
