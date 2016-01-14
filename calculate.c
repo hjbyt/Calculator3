@@ -9,9 +9,6 @@
 #include "calculate.h"
 #include "common.h"
 
-// TODO - Remove
-#include <stdio.h>
-
 /*
  * Types
  */
@@ -51,7 +48,9 @@ int compareDouble(const void* a, const void* b);
  * Constants
  */
 
-/* TODO: doc */
+/* Equality threshold for floating point comparisons.
+ * If the absolute difference between two values is <= EQUALITY_THRESHOLD,
+ * then they are considered equal.*/
 #define EQUALITY_THRESHOLD 0.000001
 
 /* Table mapping operation string to operation evaluator */

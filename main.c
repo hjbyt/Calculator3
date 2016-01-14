@@ -2,11 +2,6 @@
  * Main Module
  */
 
-/*
- * GENERAL TODO:
- *      - errors need to be propagated backwards ("messaging") instead of calling panic (see: http://moodle.tau.ac.il/mod/forum/discuss.php?d=28021)
- */
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -196,7 +191,7 @@ void interact(HashTable variables, FILE* output_file)
         }
 
         double result = evaluateExpressionTree(parse_tree, variables);
-        if (isAssignmentCommnd(parse_tree)) {
+        if (isAssignmentExpression(parse_tree)) {
             if (isnan((float)result)) {
                 fprintf(output_file, "Invalid Assignment\n");
             } else {

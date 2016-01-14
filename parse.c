@@ -14,9 +14,13 @@
  * Constants
  */
 
+/* Whitespace chars that are used to delimit tokens in assignment lines. */
 const char* DELIMITERS = " \t";
+
+/* String representing an end command. */
 #define END_COMMAND "<>"
 
+/* Array of all possible operator strings. */
 const char* OPERATORS[] = {"+", "-", "*", "/", "$", "="};
 
 /*
