@@ -501,7 +501,8 @@ double evaluateMedianExpression(Tree* tree, HashTable variables)
          child = nextBrother(child))
     {
         double current = evaluateExpressionTree(child, variables);
-        if (isnan((float)operands[i])) {
+        if (isnan((float)current)) {
+            free(operands);
             return NAN;
         }
         operands[i] = current;
