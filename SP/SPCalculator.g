@@ -48,8 +48,6 @@ exp returns [SPTree tree] :
 			  | e1=exp c=SUM_RANGE 			 e2=exp {$tree = new SPTree($c.text); $tree.insertChild($e1.tree); $tree.insertChild($e2.tree);}
 			  | e1=exp c=(MULPTIPLY|DIVIDE)  e2=exp {$tree = new SPTree($c.text); $tree.insertChild($e1.tree); $tree.insertChild($e2.tree);}
 			  | e1=exp c=(PLUS|MINUS)        e2=exp {$tree = new SPTree($c.text); $tree.insertChild($e1.tree); $tree.insertChild($e2.tree);}
-			  // Variables
-			  | v=VARIABLE {$tree = new SPTree($v.text);}
 			  ;
 
 assign returns [SPTree tree] :
@@ -71,9 +69,6 @@ SEMICOLON: ';';
 // Numbers
 NUMBER: [0-9]+;
 
-// Variables
-VARIABLE: [a-zA-Z]+;
-
 // Parentheses
 LEFT_PARENTHESIS: '(';
 RIGHT_PARENTHESIS: ')';
@@ -92,7 +87,12 @@ AVERAGE: 'average';
 COMMA: ',';
 
 // Valid variable name
-VAR_NAME: [a-zA-Z]+;
+VAR_NAME: 
+	  'm' 'i' ~'n'
+	| 'm' 'a' ~'x'
+	| 'a' 'v' 'e' 'r' 'a' 'g' ~'e'
+	| 'm' 'e' 'd' 'i' 'a' ~'n'
+	| [a-zA-Z]+;
 
 // Ignore whitespace
 WHITESPACE: [ \t\r\n]+ -> skip;

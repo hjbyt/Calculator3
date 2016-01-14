@@ -8,3 +8,6 @@ classpath.txt
 out/1 out/2 out/3 out/4 out/5
 SPCalculatorMain
 out
+SP/SPCalculatorParser$AssignContext.class
+SP/SPCalculatorParser$AssignmentContext.class
+out_new/
