@@ -5,11 +5,11 @@ all:
 
 CC=gcc -std=c99 -Wall -Werror -pedantic-errors
 
-SPCalculator: main.o common.o calculate.o parse.o tree.o SPList.o SPListElement.o hashtable.o
-	$(CC) main.o common.o calculate.o parse.o tree.o SPList.o SPListElement.o hashtable.o -o SPCalculator -lm
+SPCalculator: main.o common.o calculate.o parse.o tree.o SPList.o SPListElement.o hashtable.o graph.o
+	$(CC) main.o common.o calculate.o parse.o tree.o SPList.o SPListElement.o hashtable.o graph.o -o SPCalculator -lm
 
 test: test.o common.o calculate.o parse.o tree.o SPList.o SPListElement.o hashtable.o
-	$(CC) test.o common.o calculate.o parse.o tree.o SPList.o SPListElement.o hashtable.o -o test -lm
+	$(CC) test.o common.o calculate.o parse.o tree.o SPList.o SPListElement.o hashtable.o graph.o -o test -lm
 
 main.o: main.c common.h tree.h parse.h calculate.h
 	$(CC) -c main.c
@@ -34,9 +34,12 @@ SPListElement.o: SPListElement.h SPListElement.c
 	
 hashtable.o: hashtable.h hashtable.c
 	$(CC) -c hashtable.c
+	
+graph.o: graph.c graph.h
+	$(CC) -c graph.c
 
 common.h:
-calculate.h: tree.h hashtable.h
+calculate.h: tree.h hashtable.h graph.h
 parse.h: tree.h hashtable.h
 tree.h:
 SPList.h: SPListElement.h
@@ -45,4 +48,4 @@ hashtable.h: SPListElement.h SPList.h
 
 clean:
 	cd SP; make clean
-	rm -f main.o common.o calculate.o parse.o tree.o test.o SPList.o SPListElement.o hashtable.o SPCalculator test
+	rm -f main.o common.o calculate.o parse.o tree.o test.o SPList.o SPListElement.o hashtable.o graph.o SPCalculator test
