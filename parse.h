@@ -48,8 +48,19 @@ Tree* parseLispExpression(const char* string);
  */
 void printLisp(Tree* tree);
 
-/* TODO: doc */
-bool isAssignmentCommnd(Tree* tree);
+/**
+ * Check if the given expression tree represents an assignment expression.
+ *
+ * @param
+ *      Tree* tree - Expression tree to examine.
+ *
+ * @preconditions
+ *      tree != NULL
+ *
+ * @return
+ *      true iff the Expression tree represents an assignment expression.
+ */
+bool isAssignmentExpression(Tree* tree);
 
 /**
  * Check if the given expression tree represents the quit command.
@@ -65,13 +76,44 @@ bool isAssignmentCommnd(Tree* tree);
  */
 bool isEndCommand(Tree* tree);
 
-/* TODO: doc */
+/**
+ * Convert and expression tree to an equivalent expression string (infix notation, not lisp).
+ *
+ * @param
+ *      Tree* tree - Expression tree to convert.
+ *      char* buffer - buffer which the resulting string is saved into.
+ *      unsigned int buffer_size - size of the buffer.
+ *
+ * @preconditions
+ *      - tree != NULL, buffer != NULL
+ *      - The buffer has to be large enough for the resulting string.
+ *        preferably buffer_size should be >= MAX_LINE_LENGTH + 1.
+ */
 void expressionToString(Tree* tree, char* buffer, unsigned int buffer_size);
 
-/* TODO: doc */
+/**
+ * Parse variable initialization file.
+ *
+ * @param
+ *      FILE* input_file - File to parse.
+ *      HashTable table - Table into which parsed variables are inserted.
+ *
+ * @preconditions
+ *      input_file != NULL, table != NULL
+ */
 void parseVariableInputFile(FILE* input_file, HashTable table);
 
-/* TODO: doc */
+/* Note: this function is in the interface for testing purposes. */
+/**
+ * Parse a single variable assignment line (as read from a variable initialization file).
+ *
+ * @param
+ *      char* line - line to parse.
+ *      HashTable table - Table into which parsed variables are inserted.
+ *
+ * @preconditions
+ *      input_file != NULL, table != NULL
+ */
 void parseVariableAssignmentLine(char* line, HashTable table);
 
 #endif /* PARSE_H_ */

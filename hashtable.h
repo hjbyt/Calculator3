@@ -1,4 +1,6 @@
-
+/*
+ * Hash Table Module
+ */
 #ifndef HASHTABLE_H_
 #define HASHTABLE_H_
 

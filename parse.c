@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
- #include <errno.h>
+#include <errno.h>
 #include "parse.h"
 #include "common.h"
 
@@ -14,10 +14,13 @@
  * Constants
  */
 
-
+/* Whitespace chars that are used to delimit tokens in assignment lines. */
 const char* DELIMITERS = " \t";
+
+/* String representing an end command. */
 #define END_COMMAND "<>"
 
+/* Array of all possible operator strings. */
 const char* OPERATORS[] = {"+", "-", "*", "/", "$", "="};
 
 /*
@@ -32,6 +35,7 @@ void terminalExpressionToString(Tree* tree, char** buffer_pointer, char* buffer_
 void unaryOperatorExpressionToString(Tree* tree, char** buffer_pointer, char* buffer_end);
 void binaryOperatorExpressionToString(Tree* tree, char** buffer_pointer, char* buffer_end);
 void functionExpressionToString(Tree* tree, char** buffer_pointer, char* buffer_end);
+void appendToBuffer(char* appendage, char** buffer_pointer, char* buffer_end);
 
 /*
  * Module Functions
@@ -54,7 +58,7 @@ void printLisp(Tree* tree)
     printf("\n");
 }
 
-bool isAssignmentCommnd(Tree* tree)
+bool isAssignmentExpression(Tree* tree)
 {
     VERIFY(tree != NULL);
     return (strcmp(getValue(tree), "=") == 0);
@@ -71,8 +75,6 @@ void expressionToString(Tree* tree, char* buffer, unsigned int buffer_size)
     VERIFY(tree != NULL);
     VERIFY(buffer != NULL);
 
-    /* TODO: explain the memset */
-    memset(buffer, 0, buffer_size);
     expressionToString_(tree, &buffer, buffer + buffer_size);
 }
 
@@ -212,7 +214,22 @@ void printLisp_(Tree* tree)
     printf(")");
 }
 
-/* TODO: doc */
+/**
+ * Sub-routine of expressionToString.
+ * This function gets the buffer pointer by reference,
+ * and advances it as it generates the resulting string.
+ *
+ * @param
+ *      Tree* tree - Expression tree to convert.
+ *      char** buffer_pointer - pointer to buffer given by reference (i.e. pointer to pointer).
+ *                              This pointer is advanced to the point after the string
+ *                              that is written to the buffer.
+ *      char* buffer_end - pointer to the end of the buffer.
+ *
+ * @preconditions
+ *      - tree != NULL, buffer_pointer != NULL, *buffer_pointer != NULL, buffer_end != NULL
+ *      - The buffer has to be large enough for the resulting string.
+ */
 void expressionToString_(Tree* tree, char** buffer_pointer, char* buffer_end)
 {
     VERIFY(tree != NULL);
@@ -240,27 +257,25 @@ void expressionToString_(Tree* tree, char** buffer_pointer, char* buffer_end)
     }
 }
 
-void appendToBuffer(char* appendage, char** buffer_pointer, char* buffer_end)
-{
-    VERIFY(buffer_pointer != NULL);
-    char* buffer = *buffer_pointer;
-    VERIFY(buffer != NULL);
-
-    unsigned int buffer_size = buffer_end - buffer;
-    size_t appendage_length = strlen(appendage);
-    VERIFY(buffer_size > appendage_length);
-
-    memcpy(buffer, appendage, appendage_length);
-    buffer += appendage_length;
-    *buffer_pointer = buffer;
-}
-
-/* TODO: doc */
+/**
+ * Sub-routine of expressionToString_,
+ * operates on expression trees representing terminals.
+ *
+ * @param
+ *      Tree* tree - Expression tree to convert.
+ *      char** buffer_pointer - pointer to buffer given by reference.
+ *      char* buffer_end - pointer to the end of the buffer.
+ *
+ * @preconditions
+ *      - tree != NULL, buffer_pointer != NULL, *buffer_pointer != NULL, buffer_end != NULL
+ *      - The buffer has to be large enough for the resulting string.
+ *      - !hasChildren(tree)
+ */
 void terminalExpressionToString(Tree* tree, char** buffer_pointer, char* buffer_end)
 {
     VERIFY(tree != NULL);
     VERIFY(buffer_pointer != NULL);
-    VERIFY(childrenCount(tree) == 0);
+    VERIFY(!hasChildren(tree));
 
     if (isRoot(tree)) {
         appendToBuffer("(", buffer_pointer, buffer_end);
@@ -274,7 +289,20 @@ void terminalExpressionToString(Tree* tree, char** buffer_pointer, char* buffer_
     }
 }
 
-/* TODO: doc */
+/**
+ * Sub-routine of expressionToString_,
+ * operates on expression trees representing unary operator operations.
+ *
+ * @param
+ *      Tree* tree - Expression tree to convert.
+ *      char** buffer_pointer - pointer to buffer given by reference.
+ *      char* buffer_end - pointer to the end of the buffer.
+ *
+ * @preconditions
+ *      - tree != NULL, buffer_pointer != NULL, *buffer_pointer != NULL, buffer_end != NULL
+ *      - The buffer has to be large enough for the resulting string.
+ *      - childrenCount(tree) == 1
+ */
 void unaryOperatorExpressionToString(Tree* tree, char** buffer_pointer, char* buffer_end)
 {
     VERIFY(tree != NULL);
@@ -288,7 +316,20 @@ void unaryOperatorExpressionToString(Tree* tree, char** buffer_pointer, char* bu
     appendToBuffer(")", buffer_pointer, buffer_end);
 }
 
-/* TODO: doc */
+/**
+ * Sub-routine of expressionToString_,
+ * operates on expression trees representing binary operator operations.
+ *
+ * @param
+ *      Tree* tree - Expression tree to convert.
+ *      char** buffer_pointer - pointer to buffer given by reference.
+ *      char* buffer_end - pointer to the end of the buffer.
+ *
+ * @preconditions
+ *      - tree != NULL, buffer_pointer != NULL, *buffer_pointer != NULL, buffer_end != NULL
+ *      - The buffer has to be large enough for the resulting string.
+ *      - childrenCount(tree) == 2.
+ */
 void binaryOperatorExpressionToString(Tree* tree, char** buffer_pointer, char* buffer_end)
 {
     VERIFY(tree != NULL);
@@ -303,7 +344,20 @@ void binaryOperatorExpressionToString(Tree* tree, char** buffer_pointer, char* b
     appendToBuffer(")", buffer_pointer, buffer_end);
 }
 
-/* TODO: doc */
+/**
+ * Sub-routine of expressionToString_,
+ * operates on expression trees representing general function operations.
+ *
+ * @param
+ *      Tree* tree - Expression tree to convert.
+ *      char** buffer_pointer - pointer to buffer given by reference.
+ *      char* buffer_end - pointer to the end of the buffer.
+ *
+ * @preconditions
+ *      - tree != NULL, buffer_pointer != NULL, *buffer_pointer != NULL, buffer_end != NULL
+ *      - The buffer has to be large enough for the resulting string.
+ *      - childrenCount(tree) >= 1.
+ */
 void functionExpressionToString(Tree* tree, char** buffer_pointer, char* buffer_end)
 {
     VERIFY(tree != NULL);
@@ -326,4 +380,34 @@ void functionExpressionToString(Tree* tree, char** buffer_pointer, char* buffer_
     }
 
     appendToBuffer("))", buffer_pointer, buffer_end);
+}
+
+/**
+ * Sub-routine of *ToString functions.
+ * Copy a string into the buffer, and advance the buffer pointer to after the copied string.
+ *
+ * @param
+ *      char* appendage - string to append
+ *      char** buffer_pointer - pointer to buffer given by reference.
+ *      char* buffer_end - pointer to the end of the buffer.
+ *
+ * @preconditions
+ *      - appendage != NULL, buffer_pointer != NULL, *buffer_pointer != NULL, buffer_end != NULL
+ *      - The buffer has to be large enough for the appendage (including null-terminator).
+ */
+void appendToBuffer(char* appendage, char** buffer_pointer, char* buffer_end)
+{
+    VERIFY(buffer_pointer != NULL);
+    char* buffer = *buffer_pointer;
+    VERIFY(buffer != NULL);
+
+    unsigned int buffer_size = buffer_end - buffer;
+    size_t appendage_length = strlen(appendage);
+    VERIFY(buffer_size >= appendage_length + 1);
+
+    /* Copy appendage onto buffer and advance buffer_pointer.
+     * Note that also the null-terminator is copied over. */
+    memcpy(buffer, appendage, appendage_length + 1);
+    buffer += appendage_length;
+    *buffer_pointer = buffer;
 }

@@ -23,13 +23,14 @@
     } while (0)
 
 
+/* Function Arguments Markers */
 #define IN
 #define OUT
 
-/* TODO: doc */
+/* Return length of a static array. */
 #define ARRAY_LENGTH(array) (sizeof(array)/sizeof(*array))
 
-/* TODO: doc */
+/* Check if a given string is equal to a string in a static string array. */
 #define IS_STRING_IN_ARRAY(string, array) isStringInArray(string, array, ARRAY_LENGTH(array))
 
 /*
@@ -41,7 +42,21 @@
  */
 void panic() __attribute__ ((noreturn));
 
-/* TODO: doc */
+/**
+ * Check if the given string is equal (using strcmp) to a string in a given string array.
+ *
+ * @param
+ *      const char* string - String to find.
+ *      const char** string_array - String array to search in.
+ *      unsigned int array_length - Amount of strings in the given array.
+ *
+ * @preconditions
+ *      string != NULL
+ *      const char** string_array != NULL, and every string in the array has to be valid aas well.
+ *
+ * @return
+ *      true iff a matching string is found in the array.
+ */
 bool isStringInArray(const char* string, const char** string_array, unsigned int array_length);
 
 /**
@@ -70,10 +85,29 @@ bool isNumber(const char* string);
  */
 bool isDigit(char c);
 
-/* TODO: doc */
+/**
+ * Check if the given string is a valid name (i.e. made of letters only, a-z, A-Z).
+ *
+ * @param
+ *      const char* string - String to check.
+ *
+ * @preconditions
+ *      string != NULL
+ *
+ * @return
+ *      true iff string is a valid name.
+ */
 bool isName(char* string);
 
-/* TODO: doc */
+/**
+ * Check if the given character is a letter (a-z or A-Z).
+ *
+ * @param
+ *      char c - Character to check.
+ *
+ * @return
+ *      true iff c is a letter.
+ */
 bool isLetter(char c);
 
 #endif /* COMMON_H_ */
