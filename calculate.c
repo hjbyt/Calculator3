@@ -9,17 +9,16 @@
 #include "calculate.h"
 #include "common.h"
 
-// TODO - Remove
-#include <stdio.h>
-
 /*
  * Types
  */
 
-/* TODO: doc */
+/* This defines the interface we need to use for all functions that are used
+   for evaluating different parts of the calculator */
 typedef double (*EvaluatorFunc)(Tree*, HashTable);
 
-/* TODO: doc */
+/* An internal structure that maps between a string representing a calculation in
+   the calculator, and the function that implements it internally */
 typedef struct OperationAndEvaluator_
 {
     char* operation_string;
@@ -51,10 +50,12 @@ int compareDouble(const void* a, const void* b);
  * Constants
  */
 
-/* TODO: doc */
+/* An internal epsilon by which we determine if a given double actually represents
+   an integer (and not a floating point number) for the sum-range function */
 #define EQUALITY_THRESHOLD 0.000001
 
-/* TODO: doc */
+/* This struct maps between the string representation of the operations
+   and the functions that implement their calculation */
 const OperationAndEvaluator OPERATIONS[] = {
         {"+",       evaluatePlusExpression      },
         {"-",       evaluateMinusExpression     },
@@ -92,7 +93,18 @@ double evaluateExpressionTree(Tree* tree, HashTable variables)
  * Internal Functions
  */
 
-/* TODO: doc */
+/**
+ * Returns the relevant evaluating function for a given evaluation literal
+ *
+ * @param
+ * 		char* operation_string The name of the operation to evaluate
+ *
+ * @preconditions
+ *      - operationg_string != NULL
+ *
+ * @return
+ *		The function that evaluates the given type of calculation
+ */
 EvaluatorFunc getEvaluator(char* operation_string)
 {
     OperationAndEvaluator operation_pair;
@@ -117,6 +129,7 @@ EvaluatorFunc getEvaluator(char* operation_string)
  *
  * @param
  * 		Tree* tree - Expression sub-tree to evaluate.
+ *      Hashtable variables - The hashtable mapping all the variables to their values
  *
  * @preconditions
  *      - tree != NULL
@@ -149,6 +162,7 @@ double evaluateTerminalExpression(Tree* tree, HashTable variables)
  *
  * @param
  * 		Tree* tree - Expression sub-tree to evaluate.
+ *      Hashtable variables - The hashtable mapping all the variables to their values
  *
  * @preconditions
  *      - tree != NULL
@@ -179,6 +193,7 @@ double evaluatePlusExpression(Tree* tree, HashTable variables)
  *
  * @param
  * 		Tree* tree - Expression sub-tree to evaluate.
+ *      Hashtable variables - The hashtable mapping all the variables to their values
  *
  * @preconditions
  *      - tree != NULL
@@ -210,6 +225,7 @@ double evaluateMinusExpression(Tree* tree, HashTable variables)
  *
  * @param
  * 		Tree* tree - Expression sub-tree to evaluate.
+ *      Hashtable variables - The hashtable mapping all the variables to their values
  *
  * @preconditions
  *      - tree != NULL
@@ -233,6 +249,7 @@ double evaluateMultiplyExpression(Tree* tree, HashTable variables)
  *
  * @param
  * 		Tree* tree - Expression sub-tree to evaluate.
+ *      Hashtable variables - The hashtable mapping all the variables to their values
  *
  * @preconditions
  *      - tree != NULL
@@ -260,6 +277,7 @@ double evaluateDivideExpression(Tree* tree, HashTable variables)
  *
  * @param
  * 		Tree* tree - Expression sub-tree to evaluate.
+ *      Hashtable variables - The hashtable mapping all the variables to their values
  *
  * @preconditions
  *      - tree != NULL
@@ -288,7 +306,21 @@ double evaluateSumRangeExpression(Tree* tree, HashTable variables)
     }
 }
 
-/* TODO: doc */
+/**
+ * Evaluate an assignment sub-tree (tree leaf).
+ *
+ * @param
+ * 		Tree* tree - Assignment sub-tree to evaluate.
+ *      Hashtable variables - The hashtable mapping all the variables to their values
+ *
+ * @preconditions
+ *      - tree != NULL
+ *      - tree is a leaf node.
+ *      - The value of tree is a valid number string
+ *
+ * @return
+ *		Evaluation result.
+ */
 double evaluateAssignmentExpression(Tree* tree, HashTable variables)
 {
     VERIFY(tree != NULL);
@@ -314,6 +346,7 @@ double evaluateAssignmentExpression(Tree* tree, HashTable variables)
  *
  * @param
  * 		Tree* tree - Expression sub-tree to evaluate.
+ *      Hashtable variables - The hashtable mapping all the variables to their values
  *
  * @preconditions
  *      - tree != NULL
@@ -348,6 +381,7 @@ double evaluateMinExpression(Tree* tree, HashTable variables)
  *
  * @param
  * 		Tree* tree - Expression sub-tree to evaluate.
+ *      Hashtable variables - The hashtable mapping all the variables to their values
  *
  * @preconditions
  *      - tree != NULL
@@ -382,6 +416,7 @@ double evaluateMaxExpression(Tree* tree, HashTable variables)
  *
  * @param
  * 		Tree* tree - Expression sub-tree to evaluate.
+ *      Hashtable variables - The hashtable mapping all the variables to their values
  *
  * @preconditions
  *      - tree != NULL
@@ -416,6 +451,7 @@ double evaluateAverageExpression(Tree* tree, HashTable variables)
  *
  * @param
  * 		Tree* tree - Expression sub-tree to evaluate.
+ *      Hashtable variables - The hashtable mapping all the variables to their values
  *
  * @preconditions
  *      - tree != NULL
@@ -482,7 +518,22 @@ long long int rangeSum(long long int  a, long long int  b)
     return (a + b) * (b - a + 1) / 2;
 }
 
-/* TODO: doc */
+/**
+ * Compares the values in two given doubles pointed by the arguments (used as a callback for the qsort function)
+ *
+ * @param
+ *      const void* a - The first value to compare
+ *      const void* b - The second value to compare
+ *
+ * @preconditions
+ *      a != NULL
+ *      b != NULL
+ *
+ * @return
+ *      -1 if the second value is greater than the first
+ *      0 if the values are equall
+ *      1 if the first value is greater than the second
+ */
 int compareDouble(const void* a, const void* b)
 {
     double a_ = *(double*)a;
