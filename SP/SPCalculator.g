@@ -52,15 +52,15 @@ exp returns [SPTree tree] :
 			  ;
 
 function returns [SPTree tree]:
-			LEFT_BRACKET e=exp COMMA c1=NUMBER COMMA c2=NUMBER COMMA ch=('$' | '%' | '&' | '*' | '~' | '+' | '#' | '@') RIGHT_BRACKET 
-				{$tree = new SPTree("function"); $tree.insertChild($e.tree); $tree.insertChild(new SPTree($c1.text)); 
-				$tree.insertChild(new SPTree($c2.text)); $tree.insertChild(new SPTree($ch.text));}
+			LEFT_BRACKET e=exp COMMA c1=functionNumber COMMA c2=functionNumber COMMA ch=('$' | '%' | '&' | '*' | '~' | '+' | '#' | '@') RIGHT_BRACKET 
+				{$tree = new SPTree("function"); $tree.insertChild($e.tree); $tree.insertChild($c1.tree); 
+				$tree.insertChild($c2.tree); $tree.insertChild(new SPTree($ch.text));}
 			;
 
 graph returns [SPTree tree] :
 			g=GRAPH {$tree = new SPTree("graph");} LEFT_PARENTHESIS f=VAR_NAME COMMA n=NUMBER COMMA 
 				{$tree.insertChild(new SPTree($f.text)); $tree.insertChild(new SPTree($n.text));}
-				func1=function {$tree.insertChild($func1.tree);} (COMMA func2=function {$tree.insertChild($func2.tree);})*
+				func1=function {$tree.insertChild($func1.tree);} (COMMA func2=function {$tree.insertChild($func2.tree);})* RIGHT_PARENTHESIS
 			;
 
 assign returns [SPTree tree] :
@@ -74,6 +74,11 @@ expList returns [ ArrayList<SPTree> children ]
     } :
     e1=exp {$children.add($e1.tree);} (COMMA e2=exp {$children.add($e2.tree);})*
     ;
+   
+functionNumber returns [SPTree tree] :
+	  MINUS n=NUMBER {$tree = new SPTree("-"); $tree.insertChild(new SPTree($n.text));}
+	| n=NUMBER {$tree = new SPTree($n.text);}
+	;
 
 // parser rules start with lowercase letters, lexer rules with uppercase
 TERMINATION: '<>';
