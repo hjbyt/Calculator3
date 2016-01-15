@@ -7,11 +7,6 @@
 #include "common.h"
 
 /*
- * TODO: doc internal functions.
- * TODO: refactor some things ?
- */
-
-/*
  * Constants
  */
 
@@ -38,10 +33,26 @@ typedef enum LookupOperation_e {
  * Internal Functions
  */
 
+/**
+ * lookupElementByName: Finds an element in the table by it's name, creates a new one, or deletes
+ * an exiting one (based on the action).
+ *
+ * @param table Target hash table to work on
+ * @param name The name of the element to work on
+ * @param operation Says wheather to create, get or delete the element
+ * @param element Out parameter that receives the element for the GET operation
+ * @return Says wheather the operation succeeded or not
+ */
 bool lookupElementByName(HashTable table,
                          char* name,
                          LookupOperation operation,
                          OUT SPListElement* element);
+/**
+ * lookupElementByName: Hashes the given string (for the hash table)
+ *
+ * @param str The string to hash (untill the '\0' character is found)
+ * @return The resulting hash value
+ */
 int hash(const char* str);
 
 /*
