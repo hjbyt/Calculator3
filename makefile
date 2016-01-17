@@ -45,4 +45,4 @@ hashtable.h: SPListElement.h SPList.h
 
 clean:
 	cd SP; make clean
-	rm -f main.o common.o calculate.o parse.o tree.o test.o SPList.o SPListElement.o hashtable.o graph.o SPCalculator test
+	rm -f main.o common.o calculate.o parse.o tree.o test.o SPList.o SPListElement.o hashtable.o SPCalculator test

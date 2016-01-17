@@ -45,7 +45,6 @@ long long int  rangeSum(long long int  a, long long int  b);
 bool isNumber(const char* string);
 bool isDigit(char c);
 int compareDouble(const void* a, const void* b);
-bool isValidFileName(const char * fileName);
 
 /*
  * Constants
@@ -580,11 +579,4 @@ int compareDouble(const void* a, const void* b)
     } else {
         return 1;
     }
-}
-
-/* TODO: doc */
-bool isValidFileName(const char * fileName)
-{
-    /* TODO - Implement using the file names from main */
-    return true;
 }
