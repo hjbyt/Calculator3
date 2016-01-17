@@ -49,6 +49,7 @@ int main(int argc, char **argv)
     int return_value = EXIT_FAILURE;
     FILE* variable_input_file = NULL;
     FILE* output_file = NULL;
+    HashTable variables = NULL;
 
     /* Parse args */
     CommandLineArgs parsed_args;
@@ -81,7 +82,7 @@ int main(int argc, char **argv)
     }
 
     /* Parse initial variables */
-    HashTable variables = createHashTable();
+    variables = createHashTable();
     if (variable_input_file != NULL) {
         parseVariableInputFile(variable_input_file, variables);
     }
@@ -92,6 +93,9 @@ int main(int argc, char **argv)
     return_value = EXIT_SUCCESS;
 
 end:
+    if (variables != NULL) {
+        destroyHashTable(variables);
+    }
     if (variable_input_file != NULL) {
         fclose(variable_input_file);
     }
