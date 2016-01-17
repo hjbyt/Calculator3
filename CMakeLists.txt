@@ -12,6 +12,7 @@ set(SOURCE_FILES
         hashtable.c hashtable.h
         SPList.c SPList.h
         SPListElement.c SPListElement.h
+        graph.c graph.h
         test.c)
 
 add_executable(calculator3 ${SOURCE_FILES})

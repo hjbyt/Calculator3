@@ -45,6 +45,7 @@ tree.h:
 SPList.h: SPListElement.h
 SPListElement.h:
 hashtable.h: SPListElement.h SPList.h
+graph.h: common.h tree.h
 
 clean:
 	cd SP; make clean

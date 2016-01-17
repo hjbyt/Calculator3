@@ -80,6 +80,7 @@ const OperationAndEvaluator OPERATIONS[] = {
 double evaluateExpressionTree(Tree* tree, HashTable variables)
 {
     VERIFY(tree != NULL);
+    VERIFY(variables != NULL);
 
     if (!hasChildren(tree)) {
         return evaluateTerminalExpression(tree, variables);
@@ -101,16 +102,18 @@ double evaluateExpressionTree(Tree* tree, HashTable variables)
  * Returns the relevant evaluating function for a given evaluation literal
  *
  * @param
- * 		char* operation_string The name of the operation to evaluate
+ * 		char* operation_string - The name of the operation to evaluate.
  *
  * @preconditions
- *      - operationg_string != NULL
+ *      - operation_string != NULL
  *
  * @return
- *		The function that evaluates the given type of calculation
+ *		The function that evaluates the given type of calculation,
+ *    or NULL if the given operation is not supported.
  */
 EvaluatorFunc getEvaluator(char* operation_string)
 {
+    VERIFY(operation_string != NULL);
     OperationAndEvaluator operation_pair;
     bool found = false;
     for (int i = 0; i < ARRAY_LENGTH(OPERATIONS); ++i)
@@ -133,12 +136,13 @@ EvaluatorFunc getEvaluator(char* operation_string)
  *
  * @param
  * 		Tree* tree - Expression sub-tree to evaluate.
- *      Hashtable variables - The hashtable mapping all the variables to their values
+ * 		HashTable variables - variables to use for evaluation.
  *
  * @preconditions
  *      - tree != NULL
  *      - tree is a leaf node.
  *      - The value of tree is a valid number string
+ *      - variables != NULL
  *
  * @return
  *		Evaluation result.
@@ -147,6 +151,7 @@ double evaluateTerminalExpression(Tree* tree, HashTable variables)
 {
     VERIFY(tree != NULL);
     VERIFY(!hasChildren(tree));
+    VERIFY(variables != NULL);
     char* terminal = getValue(tree);
     if (isName(terminal)) {
         if (hashContains(variables, terminal)) {
@@ -166,11 +171,12 @@ double evaluateTerminalExpression(Tree* tree, HashTable variables)
  *
  * @param
  * 		Tree* tree - Expression sub-tree to evaluate.
- *      Hashtable variables - The hashtable mapping all the variables to their values
+ * 		HashTable variables - variables to use for evaluation.
  *
  * @preconditions
  *      - tree != NULL
  *      - tree has 1 or 2 children.
+ *      - variables != NULL
  *
  * @return
  *		Evaluation result.
@@ -178,6 +184,7 @@ double evaluateTerminalExpression(Tree* tree, HashTable variables)
 double evaluatePlusExpression(Tree* tree, HashTable variables)
 {
     VERIFY(tree != NULL);
+    VERIFY(variables != NULL);
     switch (childrenCount(tree)) {
         case 1:
             return evaluateExpressionTree(firstChild(tree), variables);
@@ -197,11 +204,12 @@ double evaluatePlusExpression(Tree* tree, HashTable variables)
  *
  * @param
  * 		Tree* tree - Expression sub-tree to evaluate.
- *      Hashtable variables - The hashtable mapping all the variables to their values
+ * 		HashTable variables - variables to use for evaluation.
  *
  * @preconditions
  *      - tree != NULL
  *      - tree has 1 or 2 children.
+ *      - variables != NULL
  *
  * @return
  *		Evaluation result.
@@ -209,6 +217,7 @@ double evaluatePlusExpression(Tree* tree, HashTable variables)
 double evaluateMinusExpression(Tree* tree, HashTable variables)
 {
     VERIFY(tree != NULL);
+    VERIFY(variables != NULL);
     switch (childrenCount(tree))
     {
         case 1:
@@ -229,11 +238,12 @@ double evaluateMinusExpression(Tree* tree, HashTable variables)
  *
  * @param
  * 		Tree* tree - Expression sub-tree to evaluate.
- *      Hashtable variables - The hashtable mapping all the variables to their values
+ * 		HashTable variables - variables to use for evaluation.
  *
  * @preconditions
  *      - tree != NULL
  *      - tree has 2 children.
+ *      - variables != NULL
  *
  * @return
  *		Evaluation result.
@@ -242,6 +252,7 @@ double evaluateMultiplyExpression(Tree* tree, HashTable variables)
 {
     VERIFY(tree != NULL);
     VERIFY(childrenCount(tree) == 2);
+    VERIFY(variables != NULL);
     double a = evaluateExpressionTree(firstChild(tree), variables);
     double b = evaluateExpressionTree(lastChild(tree), variables);
     return a * b;
@@ -253,11 +264,12 @@ double evaluateMultiplyExpression(Tree* tree, HashTable variables)
  *
  * @param
  * 		Tree* tree - Expression sub-tree to evaluate.
- *      Hashtable variables - The hashtable mapping all the variables to their values
+ * 		HashTable variables - variables to use for evaluation.
  *
  * @preconditions
  *      - tree != NULL
  *      - tree has 2 children.
+ *      - variables != NULL
  *
  * @return
  *		Evaluation result.
@@ -266,6 +278,7 @@ double evaluateDivideExpression(Tree* tree, HashTable variables)
 {
     VERIFY(tree != NULL);
     VERIFY(childrenCount(tree) == 2);
+    VERIFY(variables != NULL);
     double a = evaluateExpressionTree(firstChild(tree), variables);
     double b = evaluateExpressionTree(lastChild(tree), variables);
     if (b == 0) {
@@ -281,11 +294,12 @@ double evaluateDivideExpression(Tree* tree, HashTable variables)
  *
  * @param
  * 		Tree* tree - Expression sub-tree to evaluate.
- *      Hashtable variables - The hashtable mapping all the variables to their values
+ * 		HashTable variables - variables to use for evaluation.
  *
  * @preconditions
  *      - tree != NULL
  *      - tree has 2 children.
+ *      - variables != NULL
  *
  * @return
  *		Evaluation result.
@@ -294,6 +308,7 @@ double evaluateSumRangeExpression(Tree* tree, HashTable variables)
 {
     VERIFY(tree != NULL);
     VERIFY(childrenCount(tree) == 2);
+    VERIFY(variables != NULL);
 
     double a_ = evaluateExpressionTree(firstChild(tree), variables);
     double b_ = evaluateExpressionTree(lastChild(tree), variables);
@@ -311,24 +326,29 @@ double evaluateSumRangeExpression(Tree* tree, HashTable variables)
 }
 
 /**
- * Evaluate an assignment sub-tree (tree leaf).
+ * Evaluate an assignment expression.
+ * If the value of the expression to assign is invalid, then NAN is returned.
  *
  * @param
  * 		Tree* tree - Assignment sub-tree to evaluate.
- *      Hashtable variables - The hashtable mapping all the variables to their values
+ *    HashTable variables - variables to use for evaluation,
+ * 		                      and to update after assignment.
  *
  * @preconditions
  *      - tree != NULL
- *      - tree is a leaf node.
- *      - The value of tree is a valid number string
+ *      - tree has 2 children.
+ *      - First child of the tree is a valid variable sub-expression,
+ *        i.e. it has no children, and it's value is a valid variable name.
+ *      - variables != NULL
  *
  * @return
- *		Evaluation result.
+ *		Evaluation result (the value assigned to the variable).
  */
 double evaluateAssignmentExpression(Tree* tree, HashTable variables)
 {
     VERIFY(tree != NULL);
     VERIFY(childrenCount(tree) == 2);
+    VERIFY(variables != NULL);
 
     double value = evaluateExpressionTree(lastChild(tree), variables);
     if (isnan((float)value)) {
@@ -346,15 +366,17 @@ double evaluateAssignmentExpression(Tree* tree, HashTable variables)
 
 /**
  * Evaluate a min expression sub-tree.
- * Returns the minimum value from the given children
+ * Returns the minimum value from the given children.
+ * If any of the sub-expressions is invalid, then NAN is returned.
  *
  * @param
  * 		Tree* tree - Expression sub-tree to evaluate.
- *      Hashtable variables - The hashtable mapping all the variables to their values
+ *    HashTable variables - variables to use for evaluation.
  *
  * @preconditions
  *      - tree != NULL
- *      - tree has at least one child.
+ *      - tree has children.
+ *      - variables != NULL
  *
  * @return
  *		Evaluation result.
@@ -363,6 +385,7 @@ double evaluateMinExpression(Tree* tree, HashTable variables)
 {
     VERIFY(NULL != tree);
     VERIFY(hasChildren(tree));
+    VERIFY(variables != NULL);
 
     double minValue = NAN;
     for (Tree* child = firstChild(tree);
@@ -381,15 +404,17 @@ double evaluateMinExpression(Tree* tree, HashTable variables)
 
 /**
  * Evaluate a max expression sub-tree.
- * Returns the maximum value from the given children
+ * Returns the maximum value from the given children.
+ * If any of the sub-expressions is invalid, then NAN is returned.
  *
  * @param
  * 		Tree* tree - Expression sub-tree to evaluate.
- *      Hashtable variables - The hashtable mapping all the variables to their values
+ * 		HashTable variables - variables to use for evaluation.
  *
  * @preconditions
  *      - tree != NULL
- *      - tree has at least one child.
+ *      - tree has children.
+ *      - variables != NULL
  *
  * @return
  *		Evaluation result.
@@ -398,6 +423,7 @@ double evaluateMaxExpression(Tree* tree, HashTable variables)
 {
     VERIFY(NULL != tree);
     VERIFY(hasChildren(tree));
+    VERIFY(variables != NULL);
 
     double maxValue = NAN;
     for (Tree* child = firstChild(tree);
@@ -416,15 +442,17 @@ double evaluateMaxExpression(Tree* tree, HashTable variables)
 
 /**
  * Evaluate an average expression sub-tree.
- * Returns the average value from the given children
+ * Returns the average value from the given children.
+ * If any of the sub-expressions is invalid, then NAN is returned.
  *
  * @param
  * 		Tree* tree - Expression sub-tree to evaluate.
- *      Hashtable variables - The hashtable mapping all the variables to their values
+ * 		HashTable variables - variables to use for evaluation.
  *
  * @preconditions
  *      - tree != NULL
- *      - tree has at least one child.
+ *      - tree has children.
+ *      - variables != NULL
  *
  * @return
  *		Evaluation result.
@@ -433,6 +461,7 @@ double evaluateAverageExpression(Tree* tree, HashTable variables)
 {
     VERIFY(NULL != tree);
     VERIFY(hasChildren(tree));
+    VERIFY(variables != NULL);
 
     double sum = 0;
     for (Tree* child = firstChild(tree);
@@ -451,15 +480,17 @@ double evaluateAverageExpression(Tree* tree, HashTable variables)
 
 /**
  * Evaluate a median expression sub-tree.
- * Returns the median value from the given children
+ * Returns the median value from the given children.
+ * If any of the sub-expressions is invalid, then NAN is returned.
  *
  * @param
  * 		Tree* tree - Expression sub-tree to evaluate.
- *      Hashtable variables - The hashtable mapping all the variables to their values
+ * 		HashTable variables - variables to use for evaluation.
  *
  * @preconditions
  *      - tree != NULL
- *      - tree has at least one child.
+ *      - tree has children.
+ *      - variables != NULL
  *
  * @return
  *		Evaluation result.
@@ -468,6 +499,7 @@ double evaluateMedianExpression(Tree* tree, HashTable variables)
 {
     VERIFY(NULL != tree);
     VERIFY(hasChildren(tree));
+    VERIFY(variables != NULL);
 
     unsigned int operands_count = childrenCount(tree);
     double* operands = malloc(operands_count * sizeof(double));
@@ -479,7 +511,8 @@ double evaluateMedianExpression(Tree* tree, HashTable variables)
          child = nextBrother(child))
     {
         double current = evaluateExpressionTree(child, variables);
-        if (isnan((float)operands[i])) {
+        if (isnan((float)current)) {
+            free(operands);
             return NAN;
         }
         operands[i] = current;
@@ -503,6 +536,7 @@ double evaluateMedianExpression(Tree* tree, HashTable variables)
     return result;
 }
 
+/* TODO: doc */
 double evaluateGraphExpression(Tree* tree, HashTable variables) 
 {
     VERIFY(NULL != tree);
@@ -530,7 +564,6 @@ double evaluateGraphExpression(Tree* tree, HashTable variables)
     return 0;
 }
 
-
 /**
  * Calculate the sum of all integers in range [a, b].
  *
@@ -551,7 +584,8 @@ long long int rangeSum(long long int  a, long long int  b)
 }
 
 /**
- * Compares the values in two given doubles pointed by the arguments (used as a callback for the qsort function)
+ * Compares the values in two given doubles pointed by the arguments.
+ * (used as a callback for the qsort function)
  *
  * @param
  *      const void* a - The first value to compare
@@ -579,6 +613,7 @@ int compareDouble(const void* a, const void* b)
     }
 }
 
+/* TODO: doc */
 bool isValidFileName(const char * fileName)
 {
     /* TODO - Implement using the file names from main */
