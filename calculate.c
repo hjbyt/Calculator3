@@ -8,7 +8,6 @@
 #include <math.h>
 #include "calculate.h"
 #include "common.h"
-#include "graph.h"
 
 /*
  * Types
@@ -41,7 +40,6 @@ double evaluateAssignmentExpression(Tree* tree, HashTable variables);
 double evaluateMinExpression(Tree* tree, HashTable variables);
 double evaluateMaxExpression(Tree* tree, HashTable variables);
 double evaluateAverageExpression(Tree* tree, HashTable variables);
-double evaluateGraphExpression(Tree* tree, HashTable variables);
 double evaluateMedianExpression(Tree* tree, HashTable variables);
 long long int  rangeSum(long long int  a, long long int  b);
 bool isNumber(const char* string);
@@ -70,7 +68,6 @@ const OperationAndEvaluator OPERATIONS[] = {
         {"max",     evaluateMaxExpression       },
         {"average", evaluateAverageExpression   },
         {"median",  evaluateMedianExpression    },
-        {"graph",   evaluateGraphExpression     },
 };
 
 /*
@@ -534,34 +531,6 @@ double evaluateMedianExpression(Tree* tree, HashTable variables)
     free(operands);
 
     return result;
-}
-
-/* TODO: doc */
-double evaluateGraphExpression(Tree* tree, HashTable variables) 
-{
-    VERIFY(NULL != tree);
-    VERIFY(3 <= childrenCount(tree));
-    
-    Tree* treeChild = firstChild(tree);
-    char* outputFileName = getValue(treeChild);
-    treeChild = nextBrother(treeChild);
-    /* TODO: decide if we want to do this like this, or if we want to make it just numbers */
-    int graphSize = evaluateTerminalExpression(treeChild, variables);
-    treeChild = nextBrother(treeChild);
-    
-    VERIFY(isValidFileName(outputFileName));
-    Graph graph = makeGraph(outputFileName, graphSize);
-    
-    while (treeChild) {
-        addFunctionToGraph(graph, treeChild);
-        treeChild = nextBrother(treeChild);
-    }
-    
-    drawGraph(graph);
-    destroyGraph(graph);
-    
-    /* TODO - Set a global variable to notify the main module not to print this result */
-    return 0;
 }
 
 /**

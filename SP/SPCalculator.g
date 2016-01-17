@@ -33,7 +33,6 @@ grammar SPCalculator;
 stat returns [SPTree tree] : e1=TERMINATION SEMICOLON {$tree = new SPTree($e1.text);}
 			   | a=assign  SEMICOLON {$tree = $a.tree;}
 			   | e2=exp    SEMICOLON {$tree = $e2.tree;}
-			   | g=graph   SEMICOLON {$tree = $g.tree;}
  ; 
 
 exp returns [SPTree tree] : 
@@ -51,18 +50,6 @@ exp returns [SPTree tree] :
 			  | e1=exp c=(PLUS|MINUS)        e2=exp {$tree = new SPTree($c.text); $tree.insertChild($e1.tree); $tree.insertChild($e2.tree);}
 			  ;
 
-function returns [SPTree tree]:
-			LEFT_BRACKET e=exp COMMA c1=functionNumber COMMA c2=functionNumber COMMA ch=('$' | '%' | '&' | '*' | '~' | '+' | '#' | '@') RIGHT_BRACKET 
-				{$tree = new SPTree("function"); $tree.insertChild($e.tree); $tree.insertChild($c1.tree); 
-				$tree.insertChild($c2.tree); $tree.insertChild(new SPTree($ch.text));}
-			;
-
-graph returns [SPTree tree] :
-			g=GRAPH {$tree = new SPTree("graph");} LEFT_PARENTHESIS f=VAR_NAME COMMA n=NUMBER COMMA 
-				{$tree.insertChild(new SPTree($f.text)); $tree.insertChild(new SPTree($n.text));}
-				func1=function {$tree.insertChild($func1.tree);} (COMMA func2=function {$tree.insertChild($func2.tree);})* RIGHT_PARENTHESIS
-			;
-
 assign returns [SPTree tree] :
 			  v=VAR_NAME c=EQUALS e=exp {$tree = new SPTree($c.text); $tree.insertChild(new SPTree($v.text)); $tree.insertChild($e.tree);}
 			  ;
@@ -74,11 +61,6 @@ expList returns [ ArrayList<SPTree> children ]
     } :
     e1=exp {$children.add($e1.tree);} (COMMA e2=exp {$children.add($e2.tree);})*
     ;
-   
-functionNumber returns [SPTree tree] :
-	  MINUS n=NUMBER {$tree = new SPTree("-"); $tree.insertChild(new SPTree($n.text));}
-	| n=NUMBER {$tree = new SPTree($n.text);}
-	;
 
 // parser rules start with lowercase letters, lexer rules with uppercase
 TERMINATION: '<>';
@@ -90,8 +72,6 @@ NUMBER: [0-9]+;
 // Parentheses
 LEFT_PARENTHESIS: '(';
 RIGHT_PARENTHESIS: ')';
-LEFT_BRACKET: '[';
-RIGHT_BRACKET: ']';
 
 // Operators
 PLUS: '+';
@@ -105,7 +85,6 @@ MAX: 'max';
 MEDIAN: 'median';
 AVERAGE: 'average';
 COMMA: ',';
-GRAPH: 'graph';
 
 // Valid variable name
 VAR_NAME: 
